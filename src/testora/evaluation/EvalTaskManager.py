@@ -14,8 +14,8 @@ def initialize():
 
     config = {
         "user": "user_name",
-        "host": "sql141.your-server.de",
-        "database": "regression_finder_db"
+        "host": "ifcg.your-database.de",
+        "database": "testora_david_tischer_db"
     }
     with open(".db_token", "r") as f:
         config["password"] = f.read().strip()

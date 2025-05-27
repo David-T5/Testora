@@ -143,6 +143,7 @@ def evaluate_against_ground_truth(cloned_repo_manager, project_name, pr, diff_te
     append_event(ClassifierEvalEvent(
         pr_nb=pr.number,
         message="Classification result",
+        test_code=diff_test.test.test_code,
         label=diff_test.label,
         predictions="#".join(predictions)
     ))

@@ -63,6 +63,7 @@ class CoverageEvent(Event):
 
 
 class ClassifierEvalEvent(Event):
+    test_code: str
     label: str
     predictions: str
 
