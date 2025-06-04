@@ -58,7 +58,8 @@ class ClassificationGroundTruth:
 
 
 def create_ground_truth_template(log_file):
-    project_name = log_file.split("/")[-2]
+    # project_name = log_file.split("/")[-2]
+    project_name = "scipy"
 
     target_dir = f"data/ground_truth/{project_name}"
     os.makedirs(target_dir, exist_ok=True)
@@ -143,7 +144,6 @@ def evaluate_against_ground_truth(cloned_repo_manager, project_name, pr, diff_te
     append_event(ClassifierEvalEvent(
         pr_nb=pr.number,
         message="Classification result",
-        test_code=diff_test.test.test_code,
         label=diff_test.label,
         predictions="#".join(predictions)
     ))
