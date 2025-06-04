@@ -31,7 +31,7 @@
         },
         {
             "test": {
-                "test_code": "import numpy as np\nfrom scipy.special import logsumexp\n\n# Example 5:\n# Return sign\na = np.array([1.0, 2.0, 3.0])\nresult, sign = logsumexp(a, return_sign=True)\nprint(\"Example 5 - Return sign:\", result, sign)",
+                "test_code": "# Example 5:import numpy as np\nfrom scipy.special import logsumexp\n\n \n# Return sign\na = np.array([1.0, 2.0, 3.0])\nresult, sign = logsumexp(a, return_sign=True)\nprint(\"Example 5 - Return sign:\", result, sign)",
                 "old_output": "Example 5 - Return sign: 3.4076059644443806 1.0\n",
                 "new_output": "Example 5 - Return sign: 3.40760596444438 1.0\n"
             },
@@ -40,7 +40,7 @@
         },
         {
             "test": {
-                "test_code": "import numpy as np\nfrom scipy.special import logsumexp\n\n# Example 20:\n# Testing different data types\na = np.array([1, 2, 3], dtype=np.int32)\nresult = logsumexp(a.astype(float))  # Convert to float for logsumexp\nprint(\"Example 20 - Different data types:\", result)",
+                "test_code": "# Example 20:import numpy as np\nfrom scipy.special import logsumexp\n\n \n# Testing different data types\na = np.array([1, 2, 3], dtype=np.int32)\nresult = logsumexp(a.astype(float))  # Convert to float for logsumexp\nprint(\"Example 20 - Different data types:\", result)",
                 "old_output": "Example 20 - Different data types: 3.4076059644443806\n",
                 "new_output": "Example 20 - Different data types: 3.40760596444438\n"
             },
