@@ -28,16 +28,19 @@ import json
 #                 "data/classification_results_03_2025/scipy/multi-question_GPT-4o.json"]
 
 # multi-question, GPT-4o-mini
-result_files = ["data/classification_results_03_2025/keras/multi-question_GPT-4o-mini.json",
-                "data/classification_results_03_2025/marshmallow/multi-question_GPT-4o-mini.json",
-                "data/classification_results_03_2025/pandas/multi-question_GPT-4o-mini.json",
-                "data/classification_results_03_2025/scipy/multi-question_GPT-4o-mini.json"]
+# result_files = ["data/classification_results_03_2025/keras/multi-question_GPT-4o-mini.json",
+#                "data/classification_results_03_2025/marshmallow/multi-question_GPT-4o-mini.json",
+#                "data/classification_results_03_2025/pandas/multi-question_GPT-4o-mini.json",
+#                "data/classification_results_03_2025/scipy/multi-question_GPT-4o-mini.json"]
 
 # multi-question, DeepSeek-R1
 # result_files = ["data/classification_results_03_2025/keras/multi-question_DeepSeek-R1.json",
 #                 "data/classification_results_03_2025/marshmallow/multi-question_DeepSeek-R1.json",
 #                 "data/classification_results_03_2025/pandas/multi-question_DeepSeek-R1.json",
 #                 "data/classification_results_03_2025/scipy/multi-question_DeepSeek-R1.json"]
+
+# multi-question, GPT-4o-mini, just SciPy
+result_files = ["data/classification_results_03_2025/scipy/multi-question_GPT-4o-mini.json"]
 
 # extract results
 print("Project, PR, Prediction, Label, Result")
