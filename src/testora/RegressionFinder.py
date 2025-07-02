@@ -16,6 +16,7 @@ from testora.prompts.RegressionClassificationPromptV4 import RegressionClassific
 from testora.prompts.RegressionClassificationPromptV5 import RegressionClassificationPromptV5
 from testora.prompts.RegressionClassificationPromptV6 import RegressionClassificationPromptV6 
 from testora.prompts.RegressionClassificationPromptV7 import RegressionClassificationPromptV7
+from testora.prompts.RegressionClassificationPromptV8 import RegressionClassificationPromptV8
 from testora.prompts.RegressionTestGeneratorPrompt import RegressionTestGeneratorPrompt
 from testora.prompts.SelectExpectedBehaviorPrompt import SelectExpectedBehaviorPrompt
 from testora.util.ClonedRepoManager import ClonedRepoManager
@@ -46,7 +47,8 @@ elif Config.classification_prompt_version == 6:
     RegressionClassificationPrompt = RegressionClassificationPromptV6
 elif Config.classification_prompt_version == 7:
     RegressionClassificationPrompt = RegressionClassificationPromptV7
-
+elif Config.classification_prompt_version == 8:
+    RegressionClassificationPrompt = RegressionClassificationPromptV8
 
 def clean_output(output):
     # remove warnings caused by coverage measurements
