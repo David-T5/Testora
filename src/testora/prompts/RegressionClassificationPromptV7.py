@@ -1,4 +1,4 @@
-class RegressionClassificationPromptV2:
+class RegressionClassificationPromptV7:
     def __init__(self, project_name, pr, fut_qualified_names, docstrings, test_code, old_output, new_output):
         self.project_name = project_name
         self.pr = pr
@@ -51,6 +51,7 @@ class RegressionClassificationPromptV2:
     def create_prompt(self):
         template = """
 The pull request "{pr_title}" of the {project_name} project changes the {fut_qualified_names} function(s).
+Your tasks is to determine whether this change accidentally introduces a regression bug, i.e., an unintended change in the functional behavior of the code. This task is important because code changes sometimes have unintended consequences.
 
 # Details about the pull request
 {pr_details}
@@ -73,13 +74,13 @@ The pull request "{pr_title}" of the {project_name} project changes the {fut_qua
 {new_output}
 
 # Task
-You should explain your reasoning and then answer six questions:
+You should explain your reasoning and then answer five questions:
 1) Is the different output a noteworthy change in behavior, such as a completely different value being computed, or is it a minor change, such as a change in a warning/error message or a change in formatting? Answer either "minor" or "noteworthy".
 2) Is the different output likely due to non-determinism, e.g., because of random sampling or a non-deterministically ordered set? Answer either "deterministic" or "non-deterministic".
 3) Does the usage example refer only to public APIs of {project_name}, or does it use any project-internal functionality? Answer either "public" or "project-internal".
 4) Does the usage example pass inputs as intended by the API documentation, or does it pass any illegal (e.g., type-incorrect) inputs? Answer either "legal" or "illegal".
-5) Is the different output intended by the developer of the pull request? A change is "intended" if it is in line with the description of the pull request or a logical consequence of it. If the change is not expected based on the pull request, it is "unintended". Answer either "intended" or "unintended".
-6) Which of the two outputs is the correct behavior? Answer either "Output 1" or "Output 2".
+5) Does the different output match the intent of the developer of the pull request? A difference is "intended" if it is in line with the description of the pull request or a logical consequence of it. In contrast, a difference is "unintended" if it is caused by an accidentally introduced regression bug. For example, a pull request that optimizes performance typically is not expected to modify the functional behavior of the code. As another example, a pull request aiming to fix a bug triggered by a specific corner case input is usually not expected to modify the behavior when executing with other inputs. In your thoughts, state the intent of the pull request, summarize how the output differs, and then reason about whether the intent and the actual output difference are consistent. Answer either "intended" or "unintended".
+6) Is the information provided sufficient to decide whether the changes are intended or unintended? Answer either "sufficient" or "insufficient".
 
 Explain your reasoning and then give your answers in the following format:
 <THOUGHTS>
@@ -115,7 +116,7 @@ Explain your reasoning and then give your answers in the following format:
                                 test_code=self.test_code,
                                 old_output=self.old_output,
                                 new_output=self.new_output)
-        if len(query) < 10000:
+        if len(query) < 30000:
             return query
 
         # too long, try with filtered diff
@@ -129,7 +130,7 @@ Explain your reasoning and then give your answers in the following format:
                                 test_code=self.test_code,
                                 old_output=self.old_output,
                                 new_output=self.new_output)
-        if len(query) < 10000:
+        if len(query) < 30000:
             return query
 
         # still too long, try without diff
@@ -143,11 +144,11 @@ Explain your reasoning and then give your answers in the following format:
                                 test_code=self.test_code,
                                 old_output=self.old_output,
                                 new_output=self.new_output)
-        if len(query) < 10000:
+        if len(query) < 30000:
             return query
 
         # still too long, omit some PR details
-        chars_to_save = len(query) - 10000
+        chars_to_save = len(query) - 30000
         full_pr_details = self.extract_pr_details()
         shortened_pr_details = full_pr_details[:(
             len(full_pr_details) - chars_to_save)]
@@ -177,6 +178,7 @@ Explain your reasoning and then give your answers in the following format:
         is_public = None
         is_legal = None
         is_surprising = None
+        is_sufficient = None
         correct_output = -1
         for line in raw_answer.split("\n"):
             if in_answer == 1:
@@ -205,10 +207,10 @@ Explain your reasoning and then give your answers in the following format:
                 elif line.strip() == "unintended":
                     is_surprising = True
             elif in_answer == 6:
-                if line.strip() == "Output 1":
-                    correct_output = 1
-                elif line.strip() == "Output 2":
-                    correct_output = 2
+                if line.strip() == "sufficient":
+                    is_sufficient = True
+                elif line.strip() == "insufficient":
+                    is_sufficient = False
 
             if line.strip() == "</ANSWER1>" or line.strip() == "</ANSWER2>" or line.strip() == "</ANSWER3>":
                 in_answer = 0
@@ -225,4 +227,4 @@ Explain your reasoning and then give your answers in the following format:
             if line.strip() == "<ANSWER6>":
                 in_answer = 6
 
-        return is_relevant_change, is_deterministic, is_public, is_legal, is_surprising, True, correct_output
+        return is_relevant_change, is_deterministic, is_public, is_legal, is_surprising, is_sufficient, correct_output
