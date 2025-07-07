@@ -32,6 +32,9 @@ classification_temp = 1.0
 # different prompts for classification task
 classification_prompt_version = 7
 
+# Consider issues (if some referenced) and start an automatic conversation with the LLM
+consider_issues = True
+
 # KEEP THIS AT THE END: log the current configuration
 current_globals = set(globals().keys())
 config_parameters = current_globals - initial_globals

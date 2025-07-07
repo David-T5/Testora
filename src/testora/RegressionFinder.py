@@ -19,6 +19,8 @@ from testora.prompts.RegressionClassificationPromptV7 import RegressionClassific
 from testora.prompts.RegressionClassificationPromptV8 import RegressionClassificationPromptV8
 from testora.prompts.RegressionTestGeneratorPrompt import RegressionTestGeneratorPrompt
 from testora.prompts.SelectExpectedBehaviorPrompt import SelectExpectedBehaviorPrompt
+from testora.prompts.ReferenceIssuePrompt import ReferenceIssuePrompt
+from testora.util.PullRequestReferences import PullRequestReferences
 from testora.util.ClonedRepoManager import ClonedRepoManager
 from testora.util.DocstringRetrieval import retrieve_relevant_docstrings
 from testora.util.Exceptions import TestoraException
@@ -300,7 +302,7 @@ def check_if_present_in_main(cloned_repo_manager, pr, new_execution):
     return main_execution.output == new_execution.output
 
 
-def classify_regression(project_name, pr, changed_functions, docstrings, old_execution, new_execution, no_cache=False, nb_samples=1):
+def classify_regression(project_name, pr, referenced_issues, changed_functions, docstrings, old_execution, new_execution, no_cache=False, nb_samples=1):
     append_event(PreClassificationEvent(pr_nb=pr.number,
                                         message="Pre-classification",
                                         test_code=old_execution.code,
@@ -316,6 +318,26 @@ def classify_regression(project_name, pr, changed_functions, docstrings, old_exe
     append_event(LLMEvent(pr_nb=pr.number,
                           message="Raw answer", content="\n---(next sample)---".join(raw_answer)))
     assert (nb_samples == len(raw_answer))
+
+    if Config.consider_issues:
+        # TODO: Consider all referenced issues
+        #       Currently just the first one is considered
+
+        if len(referenced_issues) > 0:
+
+            issue = referenced_issues[0]
+
+            issue_prompt = ReferenceIssuePrompt(issue)
+
+            raw_answer = llm.chat(  prompt,
+                                    issue_prompt,
+                                    raw_answer,
+                                    temperature=Config.classification_temp,
+                                    nb_samples=nb_samples)
+            append_event(LLMEvent(pr_nb=pr.number,
+                          message="Raw answer", content="\n---(next sample)---".join(raw_answer)))
+
+            
 
     all_results = []
     for raw_answer_sample in raw_answer:
@@ -352,7 +374,7 @@ def select_expected_behavior(project_name, pr, old_execution, new_execution, doc
     return expected_behavior
 
 
-def check_pr(github_repo, cloned_repo_manager, pr):
+def check_pr(github_repo, cloned_repo_manager, pr, referenced_issues):
     # ignore if too few or too many files changed
     # nb_modified_code_files = len(pr.non_test_modified_python_files)
     nb_modified_code_files = len(pr.non_test_modified_code_files)
@@ -499,7 +521,7 @@ def check_pr(github_repo, cloned_repo_manager, pr):
         # if difference found, classify regression
         assert old_execution.code == new_execution.code
         is_regression_bug = classify_regression(
-            github_repo.name, pr, changed_functions, docstrings, old_execution, new_execution)[0]
+            github_repo.name, pr, referenced_issues, changed_functions, docstrings, old_execution, new_execution)[0]
 
         # if classified as regression bug, ask LLM which behavior is expected (to handle coincidental bug fixes)
         if is_regression_bug:
@@ -599,18 +621,19 @@ def get_repo(project_name):
 
     return github_repo, cloned_repo_manager
 
-
 def check_single_pr(project, pr_nb):
     github_repo, cloned_repo_manager = get_repo(project)
     github_pr = github_repo.get_pull(pr_nb)
     pr = PullRequest(github_pr, github_repo, cloned_repo_manager)
+    references = PullRequestReferences(github_repo, github_pr)
+    referenced_issues = references.get_issues()
 
     # check the PR
     append_event(PREvent(pr_nb=pr_nb,
                          message="Starting to check PR",
                          title=pr.github_pr.title, url=pr.github_pr.html_url))
 
-    check_pr(github_repo, cloned_repo_manager, pr)
+    check_pr(github_repo, cloned_repo_manager, pr, referenced_issues)
 
     append_event(PREvent(pr_nb=pr_nb,
                          message="Done with PR",

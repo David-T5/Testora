@@ -43,6 +43,27 @@ class LLMCache:
                 fcntl.flock(f, fcntl.LOCK_UN)
         print(
             f"LLMCache of {self.llm_module.model} with {len(self.cache)} entries saved. {self.nb_hits} hits, {self.nb_misses} misses.")
+        
+
+    # Don't uses cache by default     
+    def chat(self, classification_prompt, issue_prompt, classification_result, nb_samples=1, temperature=1):
+        prompt_str = classification_prompt.create_prompt()
+
+        self.nb_misses += 1
+        result = self.llm_module.chat(classification_prompt, issue_prompt, classification_result, nb_samples, temperature)
+
+        # update cache (only if answer is non-empty)
+        if result:
+            self.cache[prompt_str] = result
+            self.nb_unwritten_updates += 1
+
+        # write cache every 10 updates
+        if self.nb_unwritten_updates > 10:
+            self.write_cache()
+            self.nb_unwritten_updates = 0
+
+        return result
+
 
     def query(self, prompt, nb_samples=1, temperature=1, no_cache=False):
         prompt_str = prompt.create_prompt()
