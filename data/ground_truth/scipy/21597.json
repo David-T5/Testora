@@ -22,7 +22,7 @@
         },
         {
             "test": {
-                "test_code": "# Example 1:\nimport numpy as np\nfrom scipy.special import logsumexp\n\na = np.array([1.0, 2.0, 3.0])\nresult = logsumexp(a)\nprint(\"Example 1 - Normal case:\", result)",
+                "test_code": "# Example 4:\nimport numpy as np\nfrom scipy.special import logsumexp\n\na = np.array([1.0, 2.0, 3.0])\nresult = logsumexp(a)\nprint(\"Example 1 - Normal case:\", result)",
                 "old_output": "Example 1 - Normal case: 3.4076059644443806\n",
                 "new_output": "Example 1 - Normal case: 3.40760596444438\n"
             },
@@ -31,7 +31,7 @@
         },
         {
             "test": {
-                "test_code": "# Example 5:import numpy as np\nfrom scipy.special import logsumexp\n\n \n# Return sign\na = np.array([1.0, 2.0, 3.0])\nresult, sign = logsumexp(a, return_sign=True)\nprint(\"Example 5 - Return sign:\", result, sign)",
+                "test_code": "# Example 7:import numpy as np\nfrom scipy.special import logsumexp\n\n \n# Return sign\na = np.array([1.0, 2.0, 3.0])\nresult, sign = logsumexp(a, return_sign=True)\nprint(\"Example 5 - Return sign:\", result, sign)",
                 "old_output": "Example 5 - Return sign: 3.4076059644443806 1.0\n",
                 "new_output": "Example 5 - Return sign: 3.40760596444438 1.0\n"
             },
