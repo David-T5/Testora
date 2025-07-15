@@ -4,7 +4,7 @@ from typing import List
 from openai import OpenAI, RateLimitError
 from testora.prompts.PromptCommon import system_message
 from testora.util.Logs import append_event, LLMEvent
-from testora.Config import model_version, consider_issues
+from testora.Config import model_version
 
 if model_version.startswith("gpt"):
     with open(".openai_token", "r") as f:
@@ -21,39 +21,28 @@ class OpenAIGPT:
     def __init__(self):
         self.model = model_version
 
-    def chat(self, classification_prompt, issue_prompt, classification_result, nb_samples=1, temperature=1) -> List:
-        system_message = classification_prompt.create_prompt()
-        issue_message = issue_prompt.create_prompt()
-        classification_message = "# Your answer was:\n" + classification_result[0]
-
-        if len(system_message) > 30000:
-            append_event(LLMEvent(pr_nb=-1,
-                                  message=f"System message too long",
-                                  content=f"System message:\n{system_message}"))
-            return[""]
-        
-        elif len(issue_message) > 30000:
-            append_event(LLMEvent(pr_nb=-1,
-                                  message=f"Issue Message too long",
-                                  content=f"Issue message:\n{issue_message}"))
-            return[""]
-
-        elif len(classification_message) > 30000:
-            append_event(LLMEvent(pr_nb=-1,
-                                  message=f"Classification message too long",
-                                  content=f"Classification message:\n{classification_message}"))
-            return[""]
+    # maybe switch from completion to response
+    def chat(self, classification_prompt, messages, nb_samples=1, temperature=1) -> List:
+        content = ""
+        for message in messages:
+            if len(message) > 30000:
+                append_event(LLMEvent(pr_nb=-1,
+                                  message=f"Message too long",
+                                  content=f"Message:\n{message}"))
+                return[""]
+            else:
+                content += f"{message}\n\n"
+            
+        append_event(LLMEvent(pr_nb=-1,
+                              message=f"Querying again {self.model}",
+                              content=f"System message:\n{system_message}\nUser message:\n{content}"))
         
         while True:
             try:
                 if classification_prompt.use_json_output:
                     completion = openai.chat.completions.create(
                         model=self.model,
-                        messages=[
-                            {"role": "system", "content": system_message},
-                            {"role": "user", "content": classification_message},
-                            {"role": "user", "content": issue_message},
-                        ],
+                        messages=messages,
                         n=nb_samples,
                         response_format={"type": "json_object"},
                         temperature=temperature
@@ -62,11 +51,7 @@ class OpenAIGPT:
                 else:
                     completion = openai.chat.completions.create(
                         model=self.model,
-                        messages=[
-                            {"role": "system", "content": system_message},
-                            {"role": "user", "content": classification_message},
-                            {"role": "user", "content": issue_message},
-                        ],
+                        messages=messages,
                         n=nb_samples,
                         temperature=temperature
                     )   # type: ignore[call-overload]
