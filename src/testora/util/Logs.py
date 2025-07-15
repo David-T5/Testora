@@ -67,6 +67,10 @@ class ClassifierEvalEvent(Event):
     label: str
     predictions: str
 
+class PullRequestReferencesEvent(Event):
+    related_issues_count: int
+    related_comments_count: int
+
 
 events: List = []
 last_time_stored = datetime.now()
