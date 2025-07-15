@@ -32,6 +32,8 @@ class LLMCache:
 
         self.nb_unwritten_updates = 0
 
+        self.history = []
+
         atexit.register(lambda: self.write_cache())
 
     def write_cache(self):
@@ -44,13 +46,23 @@ class LLMCache:
         print(
             f"LLMCache of {self.llm_module.model} with {len(self.cache)} entries saved. {self.nb_hits} hits, {self.nb_misses} misses.")
         
+    
+    def add_prompt_to_messages(self, role, content):
+        message = {"role": role, "content": content}
+        self.history.append(message)
+        pass
+
+    def clear_conversation_messages(self):
+        self.history = []
+        pass
+        
 
     # Don't uses cache by default     
-    def chat(self, classification_prompt, issue_prompt, classification_result, nb_samples=1, temperature=1):
+    def chat(self, classification_prompt, nb_samples=1, temperature=1):
         prompt_str = classification_prompt.create_prompt()
 
         self.nb_misses += 1
-        result = self.llm_module.chat(classification_prompt, issue_prompt, classification_result, nb_samples, temperature)
+        result = self.llm_module.chat(classification_prompt, self.history, nb_samples, temperature)
 
         # update cache (only if answer is non-empty)
         if result:
@@ -87,6 +99,7 @@ class LLMCache:
                     return cached_answers[:nb_samples]
 
         # no cached answer (or don't want to use cache), query LLM
+        self.history.append({"role": "user", "content": prompt_str})
         self.nb_misses += 1
         result = self.llm_module.query(prompt, nb_samples=nb_samples, temperature=temperature)
 
