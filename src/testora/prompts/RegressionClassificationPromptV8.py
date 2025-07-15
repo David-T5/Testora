@@ -98,7 +98,7 @@ You should explain your reasoning and then answer five questions:
 3) Does the usage example refer only to public APIs of {project_name}, or does it use any project-internal functionality? Answer either "public" or "project-internal".
 4) Does the usage example pass inputs as intended by the API documentation, or does it pass any illegal (e.g., type-incorrect) inputs? Answer either "legal" or "illegal".
 5) Does the different output match the intent of the developer of the pull request? A difference is "intended" if it is in line with the description of the pull request or a logical consequence of it. In contrast, a difference is "unintended" if it is caused by an accidentally introduced regression bug. For example, a pull request that optimizes performance typically is not expected to modify the functional behavior of the code. As another example, a pull request aiming to fix a bug triggered by a specific corner case input is usually not expected to modify the behavior when executing with other inputs. In your thoughts, state the intent of the pull request, summarize how the output differs, and then reason about whether the intent and the actual output difference are consistent. Answer either "intended" or "unintended".
-6) Is the information provided sufficient to decide whether the changes are intended or unintended? Answer either "sufficient" or "insufficient".
+6) Do the provided details in all messages, the test outputs and the test case contain enought information to answer the questions of the system message? Answer with either "yes" or "no".
 
 Explain your reasoning and then give your answers in the following format:
 <THOUGHTS>
@@ -225,9 +225,9 @@ Explain your reasoning and then give your answers in the following format:
                 elif line.strip() == "unintended":
                     is_surprising = True
             elif in_answer == 6:
-                if line.strip() == "sufficient":
+                if line.strip() == "yes":
                     is_sufficient = True
-                elif line.strip() == "insufficient":
+                elif line.strip() == "no":
                     is_sufficient = False
 
             if line.strip() == "</ANSWER1>" or line.strip() == "</ANSWER2>" or line.strip() == "</ANSWER3>":
