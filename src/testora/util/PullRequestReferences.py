@@ -1,15 +1,50 @@
 from typing import List, Dict
-
+from testora.util.Logs import append_event, PullRequestReferencesEvent
 
 class PullRequestReferences:
-    def __init__(self, github_repo, github_pr):
+    def __init__(self, github_repo, github_pr, pr_nb):
         self.pr = github_pr
         self.repo = github_repo
+        self.pr_nb = pr_nb
         pass
+
+    def get_references(self) -> List:
+        issues = []
+        comments = []
+
+        referenced_issues = self.get_issues()
+        referenced_comments = self.scan_for_comments()
+
+        append_event(PullRequestReferencesEvent(pr_nb=self.pr_nb,
+                                                message="References",
+                                                related_issues_count=len(referenced_issues),
+                                                related_comments_count=len(referenced_comments)))
+
+        for issue_nb in referenced_issues:
+            issues.append(self.repo.get_issue(issue_nb))
+
+        for elem in referenced_comments:
+            if "issue" in elem:
+                issue_nb = elem["issue"]
+                issue = self.repo.get_issue(issue_nb)
+                comment_nb = elem["comment_nb"]
+                comment = issue.get_comment(comment_nb)
+            elif "pull" in elem:
+                pull_nb = elem["pull"]
+                pull = self.repo.get_pull(pull_nb)
+                comment_nb = elem["comment_nb"]
+                comment = pull.get_comment(comment_nb)
+            else:
+                raise RuntimeError("Neither pull or issue is a valid key in the elem dict")          
+            
+            comments.append(comment)
+
+        return issues, comments
+
 
     def get_issues(self) -> List:
         body = self.pr.body
-        issues = []
+        issues_numbers = []
     
         # Search for a specific Reference issue section in the PR body.
         # If this section does not exist, just scan the complete PR body
@@ -28,13 +63,11 @@ class PullRequestReferences:
         else:
             issues_numbers = self.scan_for_reference_issues(body)
     
-        for number in issues_numbers:
-            issues.append(self.repo.get_issue(number))
-    
-        return issues
+        return issues_numbers
 
     
     # Refrerenced issues normally start with a '#' or 'gh-'
+    # Returns: [<issue_num1>, <issue_num2>, ...], where issue_num* are integer
     def scan_for_reference_issues(self, issues_body: str) -> List:
         result = []
         numbers = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
@@ -97,6 +130,7 @@ class PullRequestReferences:
         return result
 
 
+    # Returns: [{"issue": <issue_num>, "comment_nb": <num>}, {"issue": <issue_num>, "comment_nb": <num>}, ...]
     def scan_for_comments(self) -> List:
         body = self.pr.body
         result = []
@@ -111,21 +145,21 @@ class PullRequestReferences:
             if issues_link in body:
                 tmp = body[body.find(issues_link) + l1:]
                 if "#issuecomment-" in tmp:
-                    pref, suff = tmp.split("#issuecomment-")
+                    pref, suff = tmp.split("#issuecomment-", maxsplit=1)
                     issue_cmt = self._scan_for_comments(pref, suff, issue_comment=True)
                     if issue_cmt != -1:
                         result.append(issue_cmt)
-                pre_suf = body.split(issues_link)
+                pre_suf = body.split(issues_link, maxsplit=1)
                 body = pre_suf[0] + pre_suf[1]
 
             elif pull_link in body:
                 tmp = body[body.find(pull_link) + l2:]
                 if "#discussion_r" in tmp:
-                    pref, suff = tmp.split("#discussion_r")
+                    pref, suff = tmp.split("#discussion_r", maxsplit=1)
                     pull_cmt = self._scan_for_comments(pref, suff, issue_comment=False)
                     if pull_cmt != -1:
                         result.append(pull_cmt)
-                pre_suf = body.split(pull_link)
+                pre_suf = body.split(pull_link, maxsplit=1)
                 body = pre_suf[0] + pre_suf[1]
             else:
                 break
@@ -136,10 +170,10 @@ class PullRequestReferences:
     def _scan_for_comments(self, pref: str, suff: str, issue_comment=False) -> Dict:
         result = {}
         if issue_comment:
-            result["issue"] = pref
+            result["issue"] = int(pref) 
         else:
-            result["pull"] = pref
-        
+            result["pull"] = int(pref)
+
         suffix = suff
         numbers = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
         comment_nb = ""
