@@ -8,7 +8,7 @@ class LLMAnswerPrompt:
 Are you sure about your answers with the given information
 from the first user message?
 Please consider the additional from the
-user messages above in the <ADDITIONAL_INFORMATION> section.
+user messages with the <ADDITIONAL_INFORMATION> section.
 
 With these additional information and the information from the first message,
 reconsider your answers for the questions in the first message
