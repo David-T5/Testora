@@ -99,7 +99,6 @@ class LLMCache:
                     return cached_answers[:nb_samples]
 
         # no cached answer (or don't want to use cache), query LLM
-        self.history.append({"role": "user", "content": prompt_str})
         self.nb_misses += 1
         result = self.llm_module.query(prompt, nb_samples=nb_samples, temperature=temperature)
 
