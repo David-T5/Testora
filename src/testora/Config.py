@@ -35,8 +35,10 @@ classification_prompt_version = 4
 # Start an automatic conversation with the llm
 # Only with this option set to True, corresponding issues
 # will be considered.
-ref_issues = True
+ref_issues = False
 ref_comments = False
+
+automatic_chat = False
 
 # KEEP THIS AT THE END: log the current configuration
 current_globals = set(globals().keys())
