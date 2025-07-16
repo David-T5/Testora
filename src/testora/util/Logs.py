@@ -71,6 +71,9 @@ class PullRequestReferencesEvent(Event):
     related_issues_count: int
     related_comments_count: int
 
+class CreatePromptEvent(Event):
+    length: int 
+
 
 events: List = []
 last_time_stored = datetime.now()

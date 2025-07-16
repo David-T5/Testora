@@ -1,5 +1,8 @@
+from testora.util.Logs import CreatePromptEvent, append_event
+
 class ReferencedCommentsPrompt:
-    def __init__(self, comment):
+    def __init__(self, comment, pr_nb):
+        self.pr_nb = pr_nb
         self.comment = comment
         self.comment_body = comment.body
         self.use_json_output = False
@@ -14,6 +17,11 @@ Please consider the following additional information:
 
 </ADDITIONAL_INFORMATION>
 """
+
+        append_event(CreatePromptEvent(pr_nb=self.pr_nb,
+                                       message="Refernced Comment Prompt",
+                                       length=len(template)))
+
         length_body = len(self.comment_body)
 
         length_template = len(template)

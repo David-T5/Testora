@@ -328,13 +328,13 @@ def classify_regression(project_name, pr, referenced_issues, referenced_comments
     if Config.ref_issues:
         if len(referenced_issues) > 0:
             for issue in referenced_issues:
-                issue_prompt = ReferencedIssuePrompt(issue).create_prompt()
+                issue_prompt = ReferencedIssuePrompt(issue, pr.number).create_prompt()
                 llm.add_prompt_to_messages("user", issue_prompt)
 
     if Config.ref_comments:
         if len(referenced_comments) > 0:
             for comment in referenced_comments:
-                comment_prompt = ReferencedCommentsPrompt(comment).create_prompt()
+                comment_prompt = ReferencedCommentsPrompt(comment, pr.number).create_prompt()
                 llm.add_prompt_to_messages("user", comment_prompt)
 
     if Config.ref_issues or Config.ref_comments:
