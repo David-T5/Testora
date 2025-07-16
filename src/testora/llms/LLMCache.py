@@ -32,7 +32,7 @@ class LLMCache:
 
         self.nb_unwritten_updates = 0
 
-        self.history = []
+        self.conversation_messages = []
 
         atexit.register(lambda: self.write_cache())
 
@@ -49,32 +49,13 @@ class LLMCache:
     
     def add_prompt_to_messages(self, role, content):
         message = {"role": role, "content": content}
-        self.history.append(message)
+        self.conversation_messages.append(message)
         pass
 
     def clear_conversation_messages(self):
-        self.history = []
+        self.conversation_messages = []
         pass
         
-
-    # Don't uses cache by default     
-    def chat(self, classification_prompt, nb_samples=1, temperature=1):
-        prompt_str = classification_prompt.create_prompt()
-
-        self.nb_misses += 1
-        result = self.llm_module.chat(classification_prompt, self.history, nb_samples, temperature)
-
-        # update cache (only if answer is non-empty)
-        if result:
-            self.cache[prompt_str] = result
-            self.nb_unwritten_updates += 1
-
-        # write cache every 10 updates
-        if self.nb_unwritten_updates > 10:
-            self.write_cache()
-            self.nb_unwritten_updates = 0
-
-        return result
 
 
     def query(self, prompt, nb_samples=1, temperature=1, no_cache=False):
@@ -100,7 +81,7 @@ class LLMCache:
 
         # no cached answer (or don't want to use cache), query LLM
         self.nb_misses += 1
-        result = self.llm_module.query(prompt, nb_samples=nb_samples, temperature=temperature)
+        result = self.llm_module.query(prompt, self.conversation_messages, nb_samples=nb_samples, temperature=temperature)
 
         if no_cache:
             return result

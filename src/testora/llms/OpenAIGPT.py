@@ -21,88 +21,19 @@ class OpenAIGPT:
     def __init__(self):
         self.model = model_version
 
-    # maybe switch from completion to response
-    def chat(self, classification_prompt, messages, nb_samples=1, temperature=1) -> List:
-        content = ""
-        for message in messages:
-            if len(message) > 30000:
-                append_event(LLMEvent(pr_nb=-1,
-                                  message=f"Message too long",
-                                  content=f"Message:\n{message}"))
-                return[""]
-            else:
-                content += f"{message}\n\n"
-            
-        append_event(LLMEvent(pr_nb=-1,
-                              message=f"Querying again {self.model}",
-                              content=f"System message:\n{system_message}\nUser message:\n{content}"))
-        
-        while True:
-            try:
-                if classification_prompt.use_json_output:
-                    completion = openai.chat.completions.create(
-                        model=self.model,
-                        messages=messages,
-                        n=nb_samples,
-                        response_format={"type": "json_object"},
-                        temperature=temperature
-                    )
-                    break
-                else:
-                    completion = openai.chat.completions.create(
-                        model=self.model,
-                        messages=messages,
-                        n=nb_samples,
-                        temperature=temperature
-                    )   # type: ignore[call-overload]
-
-                    # handle errors that lead to no model being called
-                    if completion.model is None:
-                        append_event(LLMEvent(pr_nb=-1,
-                                              message=f"Failed to get completion",
-                                              content=f"Will try again in 1 second"))
-                        time.sleep(1)
-                        continue
-
-                    append_event(LLMEvent(pr_nb=-1,
-                                          message=f"Token usage",
-                                          content=f"prompt={completion.usage.prompt_tokens}, completion={completion.usage.completion_tokens}"))
-
-                    answers = []
-                    for choice in completion.choices:
-                        answers.append(choice.message.content)
-
-                    # handle errors that lead to empty answers
-                    if "" in answers:
-                        append_event(LLMEvent(pr_nb=-1,
-                                              message=f"Empty answer",
-                                              content=f"Will try again in 1 second"))
-                        time.sleep(1)
-                        continue
-
-                    return answers
-                
-            except RateLimitError as e:
-                append_event(LLMEvent(pr_nb=-1,
-                                      message=f"Rate limit exceeded",
-                                      content=f"Will try again in 60 seconds"))
-                time.sleep(60)
-            except JSONDecodeError as e:
-                append_event(LLMEvent(pr_nb=-1,
-                                      message=f"JSON decode error",
-                                      content=f"Will try again in 1 second"))
-                time.sleep(1)           
-
-        raise Exception("Should not reach this point")
-
-
-    def query(self, prompt, nb_samples=1, temperature=1) -> List:
+    def query(self, prompt, messages, nb_samples=1, temperature=1) -> List:
         user_message = prompt.create_prompt()
         if len(user_message) > 30000:
             append_event(LLMEvent(pr_nb=-1,
                                   message=f"Query too long",
                                   content=f"System message:\n{system_message}\nUser message:\n{user_message}"))
             return [""]
+        
+        query_messages = []
+        query_messages.append({"role": "system", "content": system_message})
+        query_messages.append({"role": "user", "content": user_message})
+        for message in messages:
+            query_messages.append(message)
 
         append_event(LLMEvent(pr_nb=-1,
                               message=f"Querying {self.model}",
@@ -113,10 +44,7 @@ class OpenAIGPT:
                 if prompt.use_json_output:
                     completion = openai.chat.completions.create(
                         model=self.model,
-                        messages=[
-                            {"role": "system", "content": system_message},
-                            {"role": "user", "content": user_message}
-                        ],
+                        messages=query_messages,
                         n=nb_samples,
                         response_format={"type": "json_object"},
                         temperature=temperature
@@ -125,10 +53,7 @@ class OpenAIGPT:
                 else:
                     completion = openai.chat.completions.create(
                         model=self.model,
-                        messages=[
-                            {"role": "system", "content": system_message},
-                            {"role": "user", "content": user_message}
-                        ],
+                        messages=query_messages,
                         n=nb_samples,
                         temperature=temperature
                     )  # type: ignore[call-overload]
