@@ -19,7 +19,7 @@ Please consider the following additional information:
 """
 
         append_event(CreatePromptEvent(pr_nb=self.pr_nb,
-                                       message="Refernced Comment Prompt",
+                                       message="Referenced Comment Prompt",
                                        length=len(template)))
 
         length_body = len(self.comment_body)
