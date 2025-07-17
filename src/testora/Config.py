@@ -35,7 +35,7 @@ classification_prompt_version = 4
 # Start an automatic conversation with the llm
 # Only with this option set to True, corresponding issues
 # will be considered.
-ref_issues = False
+ref_issues = True
 ref_comments = False
 
 automatic_chat = False
