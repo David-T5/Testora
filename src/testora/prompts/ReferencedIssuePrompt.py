@@ -11,9 +11,12 @@ class ReferencedIssuePrompt:
 
     def create_prompt(self):
         template ="""
-Please consider the following additional information:
 
 <ADDITIONAL_INFORMATION>
+
+The issue with the title {issue_title} is related to the Pull Request from 
+the fist message. Please consider the following information from this
+issue for answering the questions from the first message:
 
 {issue}
 
@@ -32,4 +35,4 @@ Please consider the following additional information:
         if length_body + length_template > 60000:
             body = self.issue_body[:60000 - length_template - 1]
         
-        return template.format(issue=body)
+        return template.format(issue_title=self.issue_title, issue=body)

@@ -9,9 +9,12 @@ class ReferencedCommentsPrompt:
 
     def create_prompt(self):
         template ="""
-Please consider the following additional information:
 
 <ADDITIONAL_INFORMATION>
+
+The following comment containts information which
+should also be considered answering the questions from the 
+first message:
 
 {comment}
 
