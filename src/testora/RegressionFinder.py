@@ -17,6 +17,7 @@ from testora.prompts.RegressionClassificationPromptV5 import RegressionClassific
 from testora.prompts.RegressionClassificationPromptV6 import RegressionClassificationPromptV6 
 from testora.prompts.RegressionClassificationPromptV7 import RegressionClassificationPromptV7
 from testora.prompts.RegressionClassificationPromptV8 import RegressionClassificationPromptV8
+from testora.prompts.RegressionClassificationPromptV9 import RegressionClassificationPromptV9
 from testora.prompts.RegressionTestGeneratorPrompt import RegressionTestGeneratorPrompt
 from testora.prompts.SelectExpectedBehaviorPrompt import SelectExpectedBehaviorPrompt
 from testora.prompts.ReferencedCommentsPrompt import ReferencedCommentsPrompt
@@ -53,6 +54,8 @@ elif Config.classification_prompt_version == 7:
     RegressionClassificationPrompt = RegressionClassificationPromptV7
 elif Config.classification_prompt_version == 8:
     RegressionClassificationPrompt = RegressionClassificationPromptV8
+elif Config.classification_prompt_version == 9:
+    RegressionClassificationPrompt = RegressionClassificationPromptV9 
 
 def clean_output(output):
     # remove warnings caused by coverage measurements
@@ -310,34 +313,23 @@ def classify_regression(project_name, pr, referenced_issues, referenced_comments
                                         test_code=old_execution.code,
                                         old_output=old_execution.output,
                                         new_output=new_execution.output))
-
+    
+    llm.clear_conversation_messages()
+    
     prompt = RegressionClassificationPrompt(
         project_name, pr, changed_functions, docstrings, old_execution.code, old_execution.output, new_execution.output)
-    raw_answer = llm.query(prompt,
+
+    if Config.automatic_chat:
+        raw_answer = llm.query(prompt,
                            temperature=Config.classification_temp,
                            no_cache=no_cache,
                            nb_samples=nb_samples)
-    append_event(LLMEvent(pr_nb=pr.number,
+        append_event(LLMEvent(pr_nb=pr.number,
                           message="Raw answer", content="\n---(next sample)---".join(raw_answer)))
-    assert (nb_samples == len(raw_answer))
-
-    # Add answers of llm to conversation history
-    for answer in raw_answer:
-        llm.add_prompt_to_messages("assistant", answer)
-    
-    if Config.ref_issues:
-        if len(referenced_issues) > 0:
-            for issue in referenced_issues:
-                issue_prompt = ReferencedIssuePrompt(issue, pr.number).create_prompt()
-                llm.add_prompt_to_messages("user", issue_prompt)
-
-    if Config.ref_comments:
-        if len(referenced_comments) > 0:
-            for comment in referenced_comments:
-                comment_prompt = ReferencedCommentsPrompt(comment, pr.number).create_prompt()
-                llm.add_prompt_to_messages("user", comment_prompt)
-
-    if Config.ref_issues or Config.ref_comments:
+        assert (nb_samples == len(raw_answer))
+        # Add answers of llm to conversation history
+        for answer in raw_answer:
+            llm.add_prompt_to_messages("assistant", answer)
 
         for raw_answer_sample in raw_answer:
             is_relevant_change, is_deterministic, is_public, is_legal, is_surprising, is_sufficient, correct_output = prompt.parse_answer(
@@ -357,14 +349,27 @@ def classify_regression(project_name, pr, referenced_issues, referenced_comments
 
         answer_prompt = LLMAnswerPrompt().create_prompt()
         llm.add_prompt_to_messages("user", answer_prompt)
-        raw_answer = llm.chat(  prompt,
-                                temperature=Config.classification_temp,
-                                nb_samples=nb_samples)
-        append_event(LLMEvent(pr_nb=pr.number,
-                          message="Raw answer", content="\n---(next sample)---".join(raw_answer)))
+    
+    if Config.ref_issues:
+        if len(referenced_issues) > 0:
+            for issue in referenced_issues:
+                issue_prompt = ReferencedIssuePrompt(issue, pr.number).create_prompt()
+                llm.add_prompt_to_messages("user", issue_prompt)
 
-    # Maybe delete this line!!
-    llm.clear_conversation_messages()
+    if Config.ref_comments:
+        if len(referenced_comments) > 0:
+            for comment in referenced_comments:
+                comment_prompt = ReferencedCommentsPrompt(comment, pr.number).create_prompt()
+                llm.add_prompt_to_messages("user", comment_prompt)
+
+    raw_answer = llm.query(prompt,
+                           temperature=Config.classification_temp,
+                           no_cache=no_cache,
+                           nb_samples=nb_samples)
+    append_event(LLMEvent(pr_nb=pr.number, 
+                          message="Raw answer", content="\n---(next sample)---".join(raw_answer)))
+    assert (nb_samples == len(raw_answer))
+
     all_results = []
     for raw_answer_sample in raw_answer:
         is_relevant_change, is_deterministic, is_public, is_legal, is_surprising, is_sufficient, correct_output = prompt.parse_answer(
