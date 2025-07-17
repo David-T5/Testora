@@ -18,7 +18,9 @@ class PullRequestReferences:
         append_event(PullRequestReferencesEvent(pr_nb=self.pr_nb,
                                                 message="References",
                                                 related_issues_count=len(referenced_issues),
-                                                related_comments_count=len(referenced_comments)))
+                                                related_issues=str(referenced_issues),
+                                                related_comments_count=len(referenced_comments),
+                                                related_comments=str(referenced_comments)))
 
         for issue_nb in referenced_issues:
             issues.append(self.repo.get_issue(issue_nb))
