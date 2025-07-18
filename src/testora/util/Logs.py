@@ -76,6 +76,15 @@ class PullRequestReferencesEvent(Event):
 class CreatePromptEvent(Event):
     length: int 
 
+class CreateIssuePromptEvent(Event):
+    length: int
+    issue_nb: int 
+
+class CreateCommentPromptEvent(Event):
+    length: int
+    issue_nb: Optional[int] = None
+    pull_nb: Optional[int] = None
+    comment_nb: int
 
 events: List = []
 last_time_stored = datetime.now()
