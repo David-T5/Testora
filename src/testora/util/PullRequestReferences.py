@@ -26,16 +26,21 @@ class PullRequestReferences:
             issues.append(self.repo.get_issue(issue_nb))
 
         for elem in referenced_comments:
+            comment = {}
             if "issue" in elem:
                 issue_nb = elem["issue"]
                 issue = self.repo.get_issue(issue_nb)
                 comment_nb = elem["comment_nb"]
-                comment = issue.get_comment(comment_nb)
+                comment["issue"] = issue_nb
+                comment["comment_nb"] = comment_nb
+                comment["content"] = issue.get_comment(comment_nb)
             elif "pull" in elem:
                 pull_nb = elem["pull"]
                 pull = self.repo.get_pull(pull_nb)
                 comment_nb = elem["comment_nb"]
-                comment = pull.get_comment(comment_nb)
+                comment["pull"] = pull_nb
+                comment["comment_nb"] = comment_nb
+                comment["content"] = pull.get_comment(comment_nb)
             else:
                 raise RuntimeError("Neither pull or issue is a valid key in the elem dict")          
             
