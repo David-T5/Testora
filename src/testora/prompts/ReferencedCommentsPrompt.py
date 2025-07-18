@@ -6,8 +6,8 @@ class ReferencedCommentsPrompt:
         self.pr_nb = pr_nb
         self.comment = comment
         self.comment_body = comment["content"].body
-        self.issue_nb = Optional[int] = None
-        self.pull_nb = Optional[int] = None
+        self.issue_nb = None
+        self.pull_nb = None
         self.comment_nb = comment["comment_nb"]
         self.use_json_output = False
 
