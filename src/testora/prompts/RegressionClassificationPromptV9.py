@@ -105,9 +105,7 @@ Explain your reasoning and then give your answers in the following format:
 """
 
 
-        append_event(CreatePromptEvent(pr_nb=self.pr.number,
-                                       message="Classification Prompt V4.1",
-                                       length=len(template)))
+        
 
         query = template.format(project_name=self.project_name,
                                 pr_title=self.pr.github_pr.title,
@@ -119,6 +117,11 @@ Explain your reasoning and then give your answers in the following format:
                                 test_code=self.test_code,
                                 old_output=self.old_output,
                                 new_output=self.new_output)
+        
+        append_event(CreatePromptEvent(pr_nb=self.pr.number,
+                                       message="Classification Prompt V4.1",
+                                       length=len(query)))
+
         if len(query) < 30000:
             return query
 

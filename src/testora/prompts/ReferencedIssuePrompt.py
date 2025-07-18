@@ -1,4 +1,4 @@
-from testora.util.Logs import CreatePromptEvent, append_event
+from testora.util.Logs import CreateIssuePromptEvent, append_event
 
 class ReferencedIssuePrompt:
     def __init__(self, issue, pr_nb):
@@ -22,17 +22,20 @@ issue for answering the questions from the first message:
 
 </ADDITIONAL_INFORMATION>
 """
-        append_event(CreatePromptEvent(pr_nb=self.pr_nb,
-                                       message="Referenced Issue Prompt",
-                                       length=len(template)))
-
         length_body = len(self.issue_body)
 
         length_template = len(template)
 
         body = self.issue_body
 
+        title = self.issue_title
+
+        append_event(CreateIssuePromptEvent(pr_nb=self.pr_nb,
+                                       message="Referenced Issue Prompt",
+                                       length=length_template + len(body) + len(title),
+                                       issue_nb=self.issue_number))
+
         if length_body + length_template > 60000:
             body = self.issue_body[:60000 - length_template - 1]
         
-        return template.format(issue_title=self.issue_title, issue=body)
+        return template.format(issue_title=title, issue=body)
