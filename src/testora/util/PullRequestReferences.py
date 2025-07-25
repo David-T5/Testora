@@ -154,7 +154,7 @@ class PullRequestReferences:
                 if "#issuecomment-" in tmp:
                     pref, suff = tmp.split("#issuecomment-", maxsplit=1)
                     issue_cmt = self._scan_for_comments(pref, suff, issue_comment=True)
-                    if issue_cmt != -1:
+                    if issue_cmt != -1 and issue_cmt not in result:
                         result.append(issue_cmt)
                 pre_suf = body.split(issues_link, maxsplit=1)
                 body = pre_suf[0] + pre_suf[1]
@@ -164,7 +164,7 @@ class PullRequestReferences:
                 if "#discussion_r" in tmp:
                     pref, suff = tmp.split("#discussion_r", maxsplit=1)
                     pull_cmt = self._scan_for_comments(pref, suff, issue_comment=False)
-                    if pull_cmt != -1:
+                    if pull_cmt != -1 and pull_cmt not in result:
                         result.append(pull_cmt)
                 pre_suf = body.split(pull_link, maxsplit=1)
                 body = pre_suf[0] + pre_suf[1]
