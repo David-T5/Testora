@@ -10,7 +10,7 @@ class RegressionClassificationPromptV8:
         self.use_json_output = False
 
 
-    def _remove_comments_from_test_code(test_code):
+    def _remove_comments_from_test_code(self, test_code):
         # remove fist line
         a = test_code.find("\n")
         test_code = test_code[a+1:]
