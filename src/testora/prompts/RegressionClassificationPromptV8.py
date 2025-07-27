@@ -10,20 +10,25 @@ class RegressionClassificationPromptV8:
         self.use_json_output = False
 
 
-    def _remove_comments_from_test_code(self, test_code):
+    def _remove_comments_from_test_code(test_code):
         # remove fist line
         a = test_code.find("\n")
         test_code = test_code[a+1:]
-    
+
         c = test_code.find("#")
-        while c > -1:
+        tmp = -1
+        while c > -1:            
             # prefix and suffix at index of comment key symbol # 
-            pref = test_code[:c]
+            pref = test_code[:c]            
             suff = test_code[c:]
             l_pref = len(pref)
             # Index of end of comment
-            b = l_pref + suff.find("\n")
-            test_code = test_code[:c-1] + test_code[b:]
+            tmp = suff.find("\n")
+            if tmp != -1:  
+                b = l_pref + tmp
+                test_code = test_code[:c-1] + test_code[b:]
+            else:
+                test_code = test_code[:c-1]
             c = test_code.find("#")
         return test_code
 
