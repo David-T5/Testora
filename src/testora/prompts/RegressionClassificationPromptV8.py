@@ -10,27 +10,52 @@ class RegressionClassificationPromptV8:
         self.use_json_output = False
 
 
-    def _remove_comments_from_test_code(self, test_code):
-        # remove fist line
-        a = test_code.find("\n")
-        test_code = test_code[a+1:]
+    def _remove_comments_from_test_code(self, test_code: str) -> str:
+        state = 0
+        code_without_comments = ""
 
-        c = test_code.find("#")
-        tmp = -1
-        while c > -1:            
-            # prefix and suffix at index of comment key symbol # 
-            pref = test_code[:c]            
-            suff = test_code[c:]
-            l_pref = len(pref)
-            # Index of end of comment
-            tmp = suff.find("\n")
-            if tmp != -1:  
-                b = l_pref + tmp
-                test_code = test_code[:c-1] + test_code[b:]
-            else:
-                test_code = test_code[:c-1]
-            c = test_code.find("#")
-        return test_code
+        l = len(test_code)
+
+        for i in range(0, l):
+            char = test_code[i]
+            match state:
+                case 0:
+                    match char:
+                        case "#":
+                            state = 3
+                        case "\"":
+                            state  = 1
+                            code_without_comments += char
+                        case "\'":
+                            state = 2
+                            code_without_comments += char
+                        case _:
+                            state = 0
+                            code_without_comments += char
+                case 1:
+                    match char:
+                        case "\"":
+                            state = 0
+                            code_without_comments += char
+                        case _:
+                            state = 1
+                            code_without_comments += char
+                case 2:
+                    match char:
+                        case "\'":
+                            state = 0
+                            code_without_comments += char
+                        case _:
+                            state = 2
+                            code_without_comments += char
+                case 3:
+                    match char:
+                        case "\n":
+                            state = 0
+                        case _:
+                            state = 3
+
+        return code_without_comments
 
     def extract_pr_details(self):
         comments = ""
