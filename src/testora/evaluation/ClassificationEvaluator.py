@@ -116,7 +116,7 @@ def read_ground_truth(project_name):
     return ground_truths
 
 
-def evaluate_against_ground_truth(cloned_repo_manager, project_name, pr, referenced_issues, referenced_comments, diff_test):
+def evaluate_against_ground_truth(cloned_repo_manager, project_name, pr, diff_test):
     changed_functions = pr.get_changed_function_names()
     old_execution = TestExecution(
         code=diff_test.test.test_code,
@@ -132,8 +132,6 @@ def evaluate_against_ground_truth(cloned_repo_manager, project_name, pr, referen
         cloned_repo_of_new_commit, new_execution.code)
 
     all_predicted_as_unintended = classify_regression(project_name, pr,
-                                                      referenced_issues,
-                                                      referenced_comments,
                                                       changed_functions,
                                                       docstrings,
                                                       old_execution, new_execution,
@@ -169,9 +167,7 @@ def evaluate():
 
         github_repo, cloned_repo_manager = get_repo(target_project)
         github_pr = github_repo.get_pull(ground_truth.pr_number)
-        pr = PullRequest(github_pr, github_repo, cloned_repo_manager)
-        references = PullRequestReferences(github_repo, github_pr, ground_truth.pr_number)
-        referenced_issues, referenced_comments = references.get_references()
+        pr = PullRequest(github_pr, github_repo, cloned_repo_manager, ground_truth.pr_number)
 
         for diff_test in ground_truth.differentiating_tests:
             if diff_test.label == "TODO":
@@ -179,7 +175,7 @@ def evaluate():
                 continue
             else:
                 evaluate_against_ground_truth(
-                    cloned_repo_manager, target_project, pr, referenced_issues, referenced_comments, diff_test)
+                    cloned_repo_manager, target_project, pr, diff_test)
 
     # store results in DB
     store_logs()
