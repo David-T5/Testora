@@ -158,24 +158,21 @@ class PullRequest:
                             line.target_line_no)
     
 
-    def get_references(self) -> List:
+    def get_reference_issues(self) -> List:
         issues = []
-        comments = []
+        reference_issues = self._scan_for_reference_issues(self.github_pr.body)
 
-        referenced_issues = self._scan_for_reference_issues(self.github_pr.body)
-        referenced_comments = self._scan_for_comments()
-
-        append_event(PullRequestReferencesEvent(pr_nb=self.pr_nb,
-                                                message="References",
-                                                related_issues_count=len(referenced_issues),
-                                                related_issues=str(referenced_issues),
-                                                related_comments_count=len(referenced_comments),
-                                                related_comments=str(referenced_comments)))
-
-        for issue_nb in referenced_issues:
+        for issue_nb in reference_issues:
             issues.append(self.github_repo.get_issue(issue_nb))
+          
+        return issues
 
-        for elem in referenced_comments:
+    
+    def get_reference_comments(self) -> List:
+        comments = []
+        reference_comments = self._scan_for_comments()
+
+        for elem in reference_comments:
             comment = {}
             if "issue" in elem:
                 issue_nb = elem["issue"]
@@ -195,8 +192,6 @@ class PullRequest:
                 raise RuntimeError("Neither pull or issue is a valid key in the elem dict")          
             
             comments.append(comment)
-
-        return issues, comments
 
     
     # Refrerenced issues normally start with a '#' or 'gh-'
