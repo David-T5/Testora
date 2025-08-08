@@ -20,10 +20,6 @@ from testora.prompts.RegressionClassificationPromptV8 import RegressionClassific
 from testora.prompts.RegressionClassificationPromptV9 import RegressionClassificationPromptV9
 from testora.prompts.RegressionTestGeneratorPrompt import RegressionTestGeneratorPrompt
 from testora.prompts.SelectExpectedBehaviorPrompt import SelectExpectedBehaviorPrompt
-from testora.prompts.ReferencedCommentsPrompt import ReferencedCommentsPrompt
-from testora.prompts.ReferencedIssuePrompt import ReferencedIssuePrompt
-from testora.prompts.LLMAnswerPrompt import LLMAnswerPrompt
-from testora.util.PullRequestReferences import PullRequestReferences
 from testora.util.ClonedRepoManager import ClonedRepoManager
 from testora.util.DocstringRetrieval import retrieve_relevant_docstrings
 from testora.util.Exceptions import TestoraException

@@ -13,7 +13,6 @@ from testora.util.LogParser import DifferentiatingTest, parse_log_files
 from testora.RegressionFinder import classify_regression, get_repo
 from testora.util.Logs import ClassifierEvalEvent, get_logs_as_json, reset_logs, store_logs, append_event
 from testora.util.PullRequest import PullRequest
-from testora.util.PullRequestReferences import PullRequestReferences
 
 
 @dataclass
