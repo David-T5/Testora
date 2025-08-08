@@ -231,7 +231,7 @@ class PullRequest:
                     else:
                         state = 5
                 case 5:
-                    # TODO: Consider to remove the restiction of lenght
+                    # TODO: Consider to remove the restriction of lenght
                     if len(token) >= 5:
                         tmp = int(token)
                         if tmp not in result:
