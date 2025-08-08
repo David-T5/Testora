@@ -21,19 +21,13 @@ class OpenAIGPT:
     def __init__(self):
         self.model = model_version
 
-    def query(self, prompt, messages, nb_samples=1, temperature=1) -> List:
+    def query(self, prompt, nb_samples=1, temperature=1) -> List:
         user_message = prompt.create_prompt()
         if len(user_message) > 30000:
             append_event(LLMEvent(pr_nb=-1,
                                   message=f"Query too long",
                                   content=f"System message:\n{system_message}\nUser message:\n{user_message}"))
             return [""]
-        
-        query_messages = []
-        query_messages.append({"role": "system", "content": system_message})
-        query_messages.append({"role": "user", "content": user_message})
-        for message in messages:
-            query_messages.append(message)
 
         append_event(LLMEvent(pr_nb=-1,
                               message=f"Querying {self.model}",
@@ -44,7 +38,10 @@ class OpenAIGPT:
                 if prompt.use_json_output:
                     completion = openai.chat.completions.create(
                         model=self.model,
-                        messages=query_messages,
+                        messages=[
+                            {"role": "system", "content": system_message},
+                            {"role": "user", "content": user_message}
+                        ],
                         n=nb_samples,
                         response_format={"type": "json_object"},
                         temperature=temperature
@@ -53,7 +50,10 @@ class OpenAIGPT:
                 else:
                     completion = openai.chat.completions.create(
                         model=self.model,
-                        messages=query_messages,
+                        messages=[
+                            {"role": "system", "content": system_message},
+                            {"role": "user", "content": user_message}
+                        ],
                         n=nb_samples,
                         temperature=temperature
                     )  # type: ignore[call-overload]

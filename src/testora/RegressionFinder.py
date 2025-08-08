@@ -20,10 +20,6 @@ from testora.prompts.RegressionClassificationPromptV8 import RegressionClassific
 from testora.prompts.RegressionClassificationPromptV9 import RegressionClassificationPromptV9
 from testora.prompts.RegressionTestGeneratorPrompt import RegressionTestGeneratorPrompt
 from testora.prompts.SelectExpectedBehaviorPrompt import SelectExpectedBehaviorPrompt
-from testora.prompts.ReferencedCommentsPrompt import ReferencedCommentsPrompt
-from testora.prompts.ReferencedIssuePrompt import ReferencedIssuePrompt
-from testora.prompts.LLMAnswerPrompt import LLMAnswerPrompt
-from testora.util.PullRequestReferences import PullRequestReferences
 from testora.util.ClonedRepoManager import ClonedRepoManager
 from testora.util.DocstringRetrieval import retrieve_relevant_docstrings
 from testora.util.Exceptions import TestoraException
@@ -307,61 +303,15 @@ def check_if_present_in_main(cloned_repo_manager, pr, new_execution):
     return main_execution.output == new_execution.output
 
 
-def classify_regression(project_name, pr, referenced_issues, referenced_comments, changed_functions, docstrings, old_execution, new_execution, no_cache=False, nb_samples=1):
+def classify_regression(project_name, pr, changed_functions, docstrings, old_execution, new_execution, no_cache=False, nb_samples=1):
     append_event(PreClassificationEvent(pr_nb=pr.number,
                                         message="Pre-classification",
                                         test_code=old_execution.code,
                                         old_output=old_execution.output,
                                         new_output=new_execution.output))
     
-    llm.clear_conversation_messages()
-    
     prompt = RegressionClassificationPrompt(
         project_name, pr, changed_functions, docstrings, old_execution.code, old_execution.output, new_execution.output)
-
-    if Config.automatic_chat:
-        raw_answer = llm.query(prompt,
-                           temperature=Config.classification_temp,
-                           no_cache=no_cache,
-                           nb_samples=nb_samples)
-        append_event(LLMEvent(pr_nb=pr.number,
-                          message="Raw answer", content="\n---(next sample)---".join(raw_answer)))
-        assert (nb_samples == len(raw_answer))
-        # Add answers of llm to conversation history
-        for answer in raw_answer:
-            llm.add_prompt_to_messages("assistant", answer)
-
-        for raw_answer_sample in raw_answer:
-            is_relevant_change, is_deterministic, is_public, is_legal, is_surprising, is_sufficient, correct_output = prompt.parse_answer(
-            [raw_answer_sample])
-        append_event(ClassificationEvent(pr_nb=pr.number,
-                                         message="First Classification",
-                                         is_relevant_change=is_relevant_change,
-                                         is_deterministic=is_deterministic,
-                                         is_public=is_public,
-                                         is_legal=is_legal,
-                                         is_surprising=is_surprising,
-                                         is_sufficient=is_sufficient,
-                                         correct_output=correct_output,
-                                         old_is_crash=is_crash(
-                                             old_execution.output),
-                                         new_is_crash=is_crash(new_execution.output)))
-
-        answer_prompt = LLMAnswerPrompt().create_prompt()
-        llm.add_prompt_to_messages("user", answer_prompt)
-    
-    if Config.ref_issues:
-        if len(referenced_issues) > 0:
-            for issue in referenced_issues:
-                issue_prompt = ReferencedIssuePrompt(issue, pr.number).create_prompt()
-                llm.add_prompt_to_messages("user", issue_prompt)
-
-    if Config.ref_comments:
-        if len(referenced_comments) > 0:
-            for comment in referenced_comments:
-                comment_prompt = ReferencedCommentsPrompt(comment, pr.number).create_prompt()
-                llm.add_prompt_to_messages("user", comment_prompt)
-
     raw_answer = llm.query(prompt,
                            temperature=Config.classification_temp,
                            no_cache=no_cache,
@@ -405,7 +355,7 @@ def select_expected_behavior(project_name, pr, old_execution, new_execution, doc
     return expected_behavior
 
 
-def check_pr(github_repo, cloned_repo_manager, pr, referenced_issues, referenced_comments):
+def check_pr(github_repo, cloned_repo_manager, pr):
     # ignore if too few or too many files changed
     # nb_modified_code_files = len(pr.non_test_modified_python_files)
     nb_modified_code_files = len(pr.non_test_modified_code_files)
@@ -552,7 +502,7 @@ def check_pr(github_repo, cloned_repo_manager, pr, referenced_issues, referenced
         # if difference found, classify regression
         assert old_execution.code == new_execution.code
         is_regression_bug = classify_regression(
-            github_repo.name, pr, referenced_issues, referenced_comments, changed_functions, docstrings, old_execution, new_execution)[0]
+            github_repo.name, pr, changed_functions, docstrings, old_execution, new_execution)[0]
 
         # if classified as regression bug, ask LLM which behavior is expected (to handle coincidental bug fixes)
         if is_regression_bug:
@@ -655,16 +605,14 @@ def get_repo(project_name):
 def check_single_pr(project, pr_nb):
     github_repo, cloned_repo_manager = get_repo(project)
     github_pr = github_repo.get_pull(pr_nb)
-    pr = PullRequest(github_pr, github_repo, cloned_repo_manager)
-    references = PullRequestReferences(github_repo, github_pr, pr_nb)
-    referenced_issues, referenced_comments = references.get_references()
+    pr = PullRequest(github_pr, github_repo, cloned_repo_manager, pr_nb)
 
     # check the PR
     append_event(PREvent(pr_nb=pr_nb,
                          message="Starting to check PR",
                          title=pr.github_pr.title, url=pr.github_pr.html_url))
 
-    check_pr(github_repo, cloned_repo_manager, pr, referenced_issues, referenced_comments)
+    check_pr(github_repo, cloned_repo_manager, pr)
 
     append_event(PREvent(pr_nb=pr_nb,
                          message="Done with PR",

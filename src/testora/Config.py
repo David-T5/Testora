@@ -34,7 +34,11 @@ classification_prompt_version = 9
 # Start an automatic conversation with the llm
 # Only with this option set to True, corresponding issues
 # will be considered.
+<<<<<<< HEAD
 ref_issues = False
+=======
+ref_issues = True
+>>>>>>> refs/remotes/origin/main
 ref_comments = False
 
 automatic_chat = False

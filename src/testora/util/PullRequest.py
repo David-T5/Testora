@@ -1,12 +1,15 @@
 from unidiff import PatchSet
 import urllib.request
 
+from typing import List, Dict
+from testora.util.Logs import append_event, PullRequestReferencesEvent
+
 from testora.util.PythonCodeUtil import equal_modulo_docstrings, extract_target_function_by_range, get_name_of_defined_function
 from testora import Config
 
 
 class PullRequest:
-    def __init__(self, github_pr, github_repo, cloned_repo_manager):
+    def __init__(self, github_pr, github_repo, cloned_repo_manager, pr_nb):
         self.github_pr = github_pr
         self.cloned_repo_manager = cloned_repo_manager
         self.number = github_pr.number
@@ -14,6 +17,9 @@ class PullRequest:
         self.post_commit = github_pr.merge_commit_sha
         self.parents = github_repo.get_commit(self.post_commit).parents
         self.pre_commit = self.parents[0].sha
+
+        self.github_repo = github_repo
+        self.pr_nb = pr_nb
 
         self._pr_url_to_patch()
         self._compute_non_test_modified_files()
@@ -150,3 +156,180 @@ class PullRequest:
                     elif line.is_added:
                         self.new_file_path_to_modified_lines[patched_file.path].add(
                             line.target_line_no)
+    
+
+    def get_reference_issues(self) -> List:
+        issues = []
+        reference_issues = self._scan_for_reference_issues(self.github_pr.body)
+
+        for issue_nb in reference_issues:
+            issues.append(self.github_repo.get_issue(issue_nb))
+          
+        return issues
+
+    
+    def get_reference_comments(self) -> List:
+        comments = []
+        reference_comments = self._scan_for_comments()
+
+        for elem in reference_comments:
+            comment = {}
+            if "issue" in elem:
+                issue_nb = elem["issue"]
+                issue = self.github_repo.get_issue(issue_nb)
+                comment_nb = elem["comment_nb"]
+                comment["issue"] = issue_nb
+                comment["comment_nb"] = comment_nb
+                comment["content"] = issue.get_comment(comment_nb)
+            elif "pull" in elem:
+                pull_nb = elem["pull"]
+                pull = self.github_repo.get_pull(pull_nb)
+                comment_nb = elem["comment_nb"]
+                comment["pull"] = pull_nb
+                comment["comment_nb"] = comment_nb
+                comment["content"] = pull.get_comment(comment_nb)
+            else:
+                raise RuntimeError("Neither pull or issue is a valid key in the elem dict")          
+            
+            comments.append(comment)
+
+    
+    # Refrerenced issues normally start with a '#' or 'gh-'
+    # Returns: [<issue_num1>, <issue_num2>, ...], where issue_num* are integer
+    def _scan_for_reference_issues(self, pr_body: str) -> List:
+        result = []
+        numbers = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
+        state = 0
+        token  = ""
+        for i in range(len(pr_body)):
+            char = pr_body[i]
+            match state:
+                case 0:
+                    match char:
+                        case "g":
+                            state = 1
+                        case "#":
+                            state = 4
+                        case _:
+                            state = 0
+                case 1:
+                    match char:
+                        case "h":
+                            state = 3
+                        case _:
+                            state = 0
+                case 3: 
+                    match char:
+                        case "-":
+                            state = 4
+                        case _:
+                            state = 0
+                case 4:
+                    if char in numbers:
+                        token += char
+                        state = 4
+                    else:
+                        state = 5
+                case 5:
+                    # TODO: Consider to remove the restriction of lenght
+                    if len(token) >= 5:
+                        tmp = int(token)
+                        if tmp not in result:
+                            result.append(tmp)
+                        token = ""
+                        match char:
+                            case "g":
+                                state = 1
+                            case "#":
+                                state = 4
+                            case _:
+                                state = 0
+                    else:
+                        token = ""
+                        match char:
+                            case "g":
+                                state = 1
+                            case "#":
+                                state = 4
+                            case _:
+                                state = 0
+                case _:
+                    raise RuntimeError("Should never reach this")           
+        return result
+
+
+    # Returns: [{"issue": <issue_num>, "comment_nb": <num>}, {"issue": <issue_num>, "comment_nb": <num>}, ...]
+    def _scan_for_comments(self) -> List:
+        body = self.github_pr.body
+        result = []
+
+        issues_link = "https://github.com/scipy/scipy/issues/"
+        pull_link = "https://github.com/scipy/scipy/pull/"
+        
+        l1 = len(issues_link)
+        l2 = len(pull_link)
+
+        while True:
+            if issues_link in body:
+                tmp = body[body.find(issues_link) + l1:]
+                if "#issuecomment-" in tmp:
+                    pref, suff = tmp.split("#issuecomment-", maxsplit=1)
+                    issue_cmt = self._scan_for_comments(pref, suff, issue_comment=True)
+                    if issue_cmt != -1 and issue_cmt not in result:
+                        result.append(issue_cmt)
+                pre_suf = body.split(issues_link, maxsplit=1)
+                body = pre_suf[0] + pre_suf[1]
+
+            elif pull_link in body:
+                tmp = body[body.find(pull_link) + l2:]
+                if "#discussion_r" in tmp:
+                    pref, suff = tmp.split("#discussion_r", maxsplit=1)
+                    pull_cmt = self._scan_for_comments(pref, suff, issue_comment=False)
+                    if pull_cmt != -1 and pull_cmt not in result:
+                        result.append(pull_cmt)
+                pre_suf = body.split(pull_link, maxsplit=1)
+                body = pre_suf[0] + pre_suf[1]
+            else:
+                break
+            
+        return result
+    
+
+    def _scan_for_comments(self, pref: str, suff: str, issue_comment=False) -> Dict:
+        result = {}
+        if issue_comment:
+            result["issue"] = int(pref) 
+        else:
+            result["pull"] = int(pref)
+
+        suffix = suff
+        numbers = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
+        comment_nb = ""
+        state = 0
+        for i in range(len(suffix)):
+            char = suffix[i]
+            match state:
+                case 0:
+                    if char in numbers:
+                        comment_nb += char
+                        state = 1
+                    else:
+                        # Link has no valid comment number
+                        return -1
+                case 1:
+                    if char in numbers:
+                        comment_nb += char
+                        state = 1
+                    else:
+                        state = 2
+                case 2:
+                    if len(comment_nb) >= 9:
+                        result["comment_nb"] = int(comment_nb)
+                        comment_nb = ""
+                        return result
+                    else:
+                        # Link has no valid comment number
+                        return -1
+                case _:
+                    raise RuntimeError("Should never reach this")
+        raise RuntimeError("Should never reach this")
