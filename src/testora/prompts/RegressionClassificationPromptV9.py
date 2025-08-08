@@ -1,4 +1,5 @@
 from testora.util.Logs import CreatePromptEvent, append_event
+from testora import Config
 
 class RegressionClassificationPromptV9:
     def __init__(self, project_name, pr, fut_qualified_names, docstrings, test_code, old_output, new_output):
@@ -50,6 +51,38 @@ class RegressionClassificationPromptV9:
         result += commit_messages
         return result
 
+
+    def extract_reference_issues(self) -> str:  
+        if Config.ref_issues:
+            issues_str = ""
+            issues = self.pr.get_reference_issues()
+
+            for issue in issues:
+                issues_str += issue.body
+                issues_str += f"\n\n"
+
+            # return issues_str
+            return "(omitted)"
+        else:
+            return "(omitted)"
+        
+    def extract_reference_comments(self) -> str:
+        if Config.ref_comments:
+            comments_str = ""
+            comments = self.pr.get_reference_comments()
+
+            for comment in comments:
+                comments_str += comment["content"]
+                comments_str += f"\n\n"
+            
+            # return comments_str
+            return "(omitted)"
+        else:
+            return "(omitted)"
+
+
+
+    
     def create_prompt(self):
         template = """
 The pull request "{pr_title}" of the {project_name} project changes the {fut_qualified_names} function(s).
@@ -57,6 +90,15 @@ Your tasks is to determine whether this change accidentally introduces a regress
 
 # Details about the pull request
 {pr_details}
+
+# Description of the pull request
+{pr_body}
+
+# Description of the related issues
+{rel_issues}
+
+# Related Comments
+{rel_comments}
 
 # Diff of the pull request
 {diff}
@@ -113,6 +155,9 @@ Explain your reasoning and then give your answers in the following format:
                                     self.fut_qualified_names),
                                 docstrings=self.docstrings,
                                 pr_details=self.extract_pr_details(),
+                                pr_body=self.pr.github_pr.body,
+                                rel_issues=self.extract_reference_issues(),
+                                rel_comments=self.extract_reference_comments(),
                                 diff=self.pr.get_full_diff(),
                                 test_code=self.test_code,
                                 old_output=self.old_output,
@@ -124,6 +169,23 @@ Explain your reasoning and then give your answers in the following format:
 
         if len(query) < 30000:
             return query
+        
+        query = template.format(project_name=self.project_name,
+                                pr_title=self.pr.github_pr.title,
+                                fut_qualified_names=", ".join(
+                                    self.fut_qualified_names),
+                                docstrings=self.docstrings,
+                                pr_details=self.extract_pr_details(),
+                                pr_body="(omitted due to lenght)",
+                                rel_issues="(omitted due to lenght)",
+                                rel_comments="(omitted due to lenght)",
+                                diff=self.pr.get_full_diff(),
+                                test_code=self.test_code,
+                                old_output=self.old_output,
+                                new_output=self.new_output)
+        
+        if len(query) < 30000:
+            return query
 
         # too long, try with filtered diff
         query = template.format(project_name=self.project_name,
@@ -132,6 +194,9 @@ Explain your reasoning and then give your answers in the following format:
                                     self.fut_qualified_names),
                                 docstrings=self.docstrings,
                                 pr_details=self.extract_pr_details(),
+                                pr_body="(omitted due to lenght)",
+                                rel_issues="(omitted due to lenght)",
+                                rel_comments="(omitted due to lenght)",
                                 diff=self.pr.get_filtered_diff(),
                                 test_code=self.test_code,
                                 old_output=self.old_output,
@@ -146,6 +211,9 @@ Explain your reasoning and then give your answers in the following format:
                                     self.fut_qualified_names),
                                 docstrings=self.docstrings,
                                 pr_details=self.extract_pr_details(),
+                                pr_body="(omitted due to lenght)",
+                                rel_issues="(omitted due to lenght)",
+                                rel_comments="(omitted due to lenght)",
                                 diff="(omitted due to length)",
                                 test_code=self.test_code,
                                 old_output=self.old_output,
@@ -165,6 +233,9 @@ Explain your reasoning and then give your answers in the following format:
                                     self.fut_qualified_names),
                                 docstrings=self.docstrings,
                                 pr_details=shortened_pr_details,
+                                pr_body="(omitted due to lenght)",
+                                rel_issues="(omitted due to lenght)",
+                                rel_comments="(omitted due to lenght)",
                                 diff="(omitted due to length)",
                                 test_code=self.test_code,
                                 old_output=self.old_output,
