@@ -163,7 +163,10 @@ class PullRequest:
         reference_issues = self._scan_for_reference_issues(self.github_pr.body)
 
         for issue_nb in reference_issues:
-            issues.append(self.github_repo.get_issue(issue_nb))
+            issue = {}
+            issue["issue_nb"] = issue_nb
+            issue["issue"] = self.github_repo.get_issue(issue_nb)
+            issues.append(issue)
           
         return issues
 
