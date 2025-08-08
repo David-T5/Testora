@@ -58,7 +58,11 @@ class RegressionClassificationPromptV9:
             issues = self.pr.get_reference_issues()
 
             for issue in issues:
-                issues_str += issue.body
+                issue_body = issue["issue"].body
+                issue_nb = issue["issue_nb"]
+                issue_title = issue["issue"].title
+                issues_str += f"## Issue {issue_nb}: {issue_title} \n"
+                issues_str += issue_body
                 issues_str += f"\n\n"
 
             # return issues_str
@@ -72,6 +76,12 @@ class RegressionClassificationPromptV9:
             comments = self.pr.get_reference_comments()
 
             for comment in comments:
+                if "pull" in comment.keys():
+                    pull_nb = comment["pull"]
+                    comments_str += f"## Related comment from Pull {pull_nb}: \n"
+                elif "issue" in comment.keys():
+                    issue_nb = comment["issue"]
+                    comments_str += f"## Related comment from Issue {issue_nb}: \n"
                 comments_str += comment["content"]
                 comments_str += f"\n\n"
             
@@ -167,7 +177,7 @@ Explain your reasoning and then give your answers in the following format:
                                        message="Classification Prompt V4.1",
                                        length=len(query)))
 
-        if len(query) < 30000:
+        if len(query) < 60000:
             return query
         
         query = template.format(project_name=self.project_name,
@@ -184,7 +194,7 @@ Explain your reasoning and then give your answers in the following format:
                                 old_output=self.old_output,
                                 new_output=self.new_output)
         
-        if len(query) < 30000:
+        if len(query) < 60000:
             return query
 
         # too long, try with filtered diff
@@ -201,7 +211,7 @@ Explain your reasoning and then give your answers in the following format:
                                 test_code=self.test_code,
                                 old_output=self.old_output,
                                 new_output=self.new_output)
-        if len(query) < 30000:
+        if len(query) < 60000:
             return query
 
         # still too long, try without diff
@@ -218,11 +228,11 @@ Explain your reasoning and then give your answers in the following format:
                                 test_code=self.test_code,
                                 old_output=self.old_output,
                                 new_output=self.new_output)
-        if len(query) < 30000:
+        if len(query) < 60000:
             return query
 
         # still too long, omit some PR details
-        chars_to_save = len(query) - 30000
+        chars_to_save = len(query) - 60000
         full_pr_details = self.extract_pr_details()
         shortened_pr_details = full_pr_details[:(
             len(full_pr_details) - chars_to_save)]
