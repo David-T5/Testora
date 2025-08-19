@@ -21,13 +21,27 @@ class OpenAIGPT:
     def __init__(self):
         self.model = model_version
 
-    def query(self, prompt, nb_samples=1, temperature=1) -> List:
+    def query(self, prompt, additional_messages=[], nb_samples=1, temperature=1) -> List:
+        messages = []
         user_message = prompt.create_prompt()
-        if len(user_message) > 30000:
+        if len(user_message) > 70000:
             append_event(LLMEvent(pr_nb=-1,
                                   message=f"Query too long",
                                   content=f"System message:\n{system_message}\nUser message:\n{user_message}"))
             return [""]
+
+        # Maybe find better solution to 
+        messages.append({"role": "system", "content": system_message})        
+
+        for message in additional_messages:
+            if len(message["content"]) > 70000:
+                append_event(LLMEvent(pr_nb=-1,
+                                      message=f"Message too long!",
+                                      content=f"Message: {message}"))
+                continue
+            messages.append(message)
+
+        messages.append({"role": "user", "content": user_message})
 
         append_event(LLMEvent(pr_nb=-1,
                               message=f"Querying {self.model}",
@@ -38,10 +52,7 @@ class OpenAIGPT:
                 if prompt.use_json_output:
                     completion = openai.chat.completions.create(
                         model=self.model,
-                        messages=[
-                            {"role": "system", "content": system_message},
-                            {"role": "user", "content": user_message}
-                        ],
+                        messages=messages,
                         n=nb_samples,
                         response_format={"type": "json_object"},
                         temperature=temperature
@@ -50,10 +61,7 @@ class OpenAIGPT:
                 else:
                     completion = openai.chat.completions.create(
                         model=self.model,
-                        messages=[
-                            {"role": "system", "content": system_message},
-                            {"role": "user", "content": user_message}
-                        ],
+                        messages=messages,
                         n=nb_samples,
                         temperature=temperature
                     )  # type: ignore[call-overload]

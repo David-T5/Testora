@@ -53,6 +53,9 @@ elif Config.classification_prompt_version == 8:
 elif Config.classification_prompt_version == 9:
     RegressionClassificationPrompt = RegressionClassificationPromptV9 
 
+if Config.automatic_chat:
+    FirstClassificationPrompt = RegressionClassificationPromptV4
+
 def clean_output(output):
     # remove warnings caused by coverage measurements
     cleaned_lines = []
@@ -304,18 +307,53 @@ def check_if_present_in_main(cloned_repo_manager, pr, new_execution):
 
 
 def classify_regression(project_name, pr, changed_functions, docstrings, old_execution, new_execution, no_cache=False, nb_samples=1):
+    additional_messages = []
+    
     append_event(PreClassificationEvent(pr_nb=pr.number,
                                         message="Pre-classification",
                                         test_code=old_execution.code,
                                         old_output=old_execution.output,
                                         new_output=new_execution.output))
     
+    if Config.automatic_chat:
+        first_prompt = FirstClassificationPrompt(
+            project_name, pr, changed_functions, docstrings, old_execution.code, old_execution.output, new_execution.output)
+        raw_answer = llm.query(first_prompt,
+                               temperature=Config.classification_temp,
+                               no_cache=no_cache,
+                               nb_samples=nb_samples)
+        
+        append_event(LLMEvent(pr_nb=pr.number, 
+                          message="Raw answer", content="\n---(next sample)---".join(raw_answer)))
+        assert (nb_samples == len(raw_answer))
+
+        # Add first prompt and llm answers to the additional messages
+        additional_messages.append({"role": "user", "content": first_prompt.create_prompt()})
+        for raw_answer_sample in raw_answer:
+            additional_messages.append({"role": "assistant", "content": str(raw_answer_sample)})
+            is_relevant_change, is_deterministic, is_public, is_legal, is_surprising, is_sufficient, correct_output = first_prompt.parse_answer(
+            [raw_answer_sample])
+            append_event(ClassificationEvent(pr_nb=pr.number,
+                                             message="First Classification",
+                                             is_relevant_change=is_relevant_change,
+                                             is_deterministic=is_deterministic,
+                                             is_public=is_public,
+                                             is_legal=is_legal,
+                                             is_surprising=is_surprising,
+                                             is_sufficient=is_sufficient,
+                                             correct_output=correct_output,
+                                             old_is_crash=is_crash(
+                                                 old_execution.output),
+                                             new_is_crash=is_crash(new_execution.output)))
+
     prompt = RegressionClassificationPrompt(
         project_name, pr, changed_functions, docstrings, old_execution.code, old_execution.output, new_execution.output)
     raw_answer = llm.query(prompt,
                            temperature=Config.classification_temp,
+                           additional_messages=additional_messages,
                            no_cache=no_cache,
                            nb_samples=nb_samples)
+    
     append_event(LLMEvent(pr_nb=pr.number, 
                           message="Raw answer", content="\n---(next sample)---".join(raw_answer)))
     assert (nb_samples == len(raw_answer))
