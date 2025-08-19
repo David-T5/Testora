@@ -38,8 +38,12 @@ classification_prompt_version = 9
 ref_issues = False
 =======
 ref_issues = True
+<<<<<<< HEAD
 >>>>>>> refs/remotes/origin/main
 ref_comments = False
+=======
+ref_comments = True
+>>>>>>> refs/remotes/origin/main
 
 automatic_chat = False
 
