@@ -65,8 +65,7 @@ class RegressionClassificationPromptV9:
                 issues_str += issue_body
                 issues_str += f"\n\n"
 
-            # return issues_str
-            return "(omitted)"
+            return issues_str
         else:
             return "(omitted)"
         
@@ -82,11 +81,10 @@ class RegressionClassificationPromptV9:
                 elif "issue" in comment.keys():
                     issue_nb = comment["issue"]
                     comments_str += f"## Related comment from Issue {issue_nb}: \n"
-                comments_str += comment["content"]
+                comments_str += comment["content"].body
                 comments_str += f"\n\n"
             
-            # return comments_str
-            return "(omitted)"
+            return comments_str
         else:
             return "(omitted)"
 
@@ -155,7 +153,6 @@ Explain your reasoning and then give your answers in the following format:
 ...
 </ANSWER5>
 """
-
 
         
 
