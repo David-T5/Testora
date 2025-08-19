@@ -1,3 +1,4 @@
+import requests
 from unidiff import PatchSet
 import urllib.request
 
@@ -25,11 +26,31 @@ class PullRequest:
         self._compute_non_test_modified_files()
         self._compute_modified_lines()
 
-    def _pr_url_to_patch(self):
-        diff_url = self.github_pr.html_url + ".diff"
-        diff = urllib.request.urlopen(diff_url)
-        encoding = diff.headers.get_charsets()[0]
-        self.patch = PatchSet(diff, encoding=encoding)
+    
+
+    def _pr_url_to_patch(self): 
+        ''' 
+        The target is to get the modified files from the patch.
+        (all the touch files in a PR, **exclude** deleted and newly added files). 
+        '''
+
+        # # option 1
+        # diff_url = self.github_pr.html_url + ".diff"
+        # diff = urllib.request.urlopen(diff_url)
+        # encoding = diff.headers.get_charsets()[0]
+        # self.patch = PatchSet(diff, encoding=encoding)
+
+        # # option 2
+        # if the above code hits the request limit, use the following instead.
+        diff_url = self.github_pr.url
+        token = open(".github_token", "r").read().strip()
+        headers = {"Authorization": f"token {token}", "Accept": "application/vnd.github.v3.diff"}
+
+        response = requests.get(diff_url, headers=headers)
+        response.raise_for_status()
+
+        # # Load diff with unidiff PatchSet
+        self.patch = PatchSet(response.text) 
 
     def _compute_non_test_modified_files(self):
         module_name = self.cloned_repo_manager.module_name
@@ -173,7 +194,7 @@ class PullRequest:
     
     def get_reference_comments(self) -> List:
         comments = []
-        reference_comments = self._scan_for_comments()
+        reference_comments = self._scan_for_reference_comments()
 
         for elem in reference_comments:
             comment = {}
@@ -195,6 +216,7 @@ class PullRequest:
                 raise RuntimeError("Neither pull or issue is a valid key in the elem dict")          
             
             comments.append(comment)
+        return comments
 
     
     # Refrerenced issues normally start with a '#' or 'gh-'
@@ -262,7 +284,7 @@ class PullRequest:
 
 
     # Returns: [{"issue": <issue_num>, "comment_nb": <num>}, {"issue": <issue_num>, "comment_nb": <num>}, ...]
-    def _scan_for_comments(self) -> List:
+    def _scan_for_reference_comments(self) -> List:
         body = self.github_pr.body
         result = []
 
