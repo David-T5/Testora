@@ -16,7 +16,6 @@ from testora.prompts.RegressionClassificationPromptV4 import RegressionClassific
 from testora.prompts.RegressionClassificationPromptV5 import RegressionClassificationPromptV5
 from testora.prompts.RegressionClassificationPromptV6 import RegressionClassificationPromptV6 
 from testora.prompts.RegressionClassificationPromptV7 import RegressionClassificationPromptV7
-from testora.prompts.RegressionClassificationPromptV8 import RegressionClassificationPromptV8
 from testora.prompts.RegressionClassificationPromptV9 import RegressionClassificationPromptV9
 from testora.prompts.RegressionTestGeneratorPrompt import RegressionTestGeneratorPrompt
 from testora.prompts.SelectExpectedBehaviorPrompt import SelectExpectedBehaviorPrompt
@@ -48,8 +47,6 @@ elif Config.classification_prompt_version == 6:
     RegressionClassificationPrompt = RegressionClassificationPromptV6
 elif Config.classification_prompt_version == 7:
     RegressionClassificationPrompt = RegressionClassificationPromptV7
-elif Config.classification_prompt_version == 8:
-    RegressionClassificationPrompt = RegressionClassificationPromptV8
 elif Config.classification_prompt_version == 9:
     RegressionClassificationPrompt = RegressionClassificationPromptV9 
 
