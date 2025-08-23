@@ -257,6 +257,12 @@ def get_ast_without_docstrings(code):
     return tree
 
 
+def get_code_without_docstrings(code: str) -> str:
+    ast_without_docstrings = get_ast_without_docstrings(code)
+    code_without_docstrings = ast.unparse(ast_without_docstrings)
+    return code_without_docstrings
+
+
 def equal_modulo_docstrings(code1, code2):
     try:
         ast1 = get_ast_without_docstrings(code1)

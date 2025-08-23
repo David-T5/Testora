@@ -45,7 +45,7 @@ ref_comments = False
 ref_comments = True
 >>>>>>> refs/remotes/origin/main
 
-automatic_chat = False
+automatic_chat = True
 
 # KEEP THIS AT THE END: log the current configuration
 current_globals = set(globals().keys())
