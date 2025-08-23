@@ -1,5 +1,5 @@
 from testora.util.Logs import CreatePromptEvent, append_event
-from testora import 
+from testora import Config
 from testora.util.PythonCodeUtil import get_code_without_docstrings
 
 class RegressionClassificationPromptV9:
