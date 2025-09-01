@@ -261,6 +261,7 @@ def get_code_without_docstrings(code: str) -> str:
     try:
         ast_without_docstrings = get_ast_without_docstrings(code)
     except:
+        # Cannot parse code, just return the input code
         return code
     code_without_docstrings = ast.unparse(ast_without_docstrings)
     return code_without_docstrings
