@@ -4,7 +4,7 @@
     "differentiating_tests": [
         {
             "test": {
-                "test_code": "# Example 12: Corner case - Creating a DataFrame with all None values\nimport pandas as pd\n data = {'a': None, 'b': None}\ncolumns = ['a', 'b']\ndf = pd.DataFrame(data, columns=columns, index=range(2))\nprint(\"DataFrame 12:\\n\", df)",
+                "test_code": "# Example 12: Corner case - Creating a DataFrame with all None values\nimport pandas as pd\ndata = {'a': None, 'b': None}\ncolumns = ['a', 'b']\ndf = pd.DataFrame(data, columns=columns, index=range(2))\nprint(\"DataFrame 12:\\n\", df)",
                 "old_output": "DataFrame 12:\n      a    b\n0  NaN  NaN\n1  NaN  NaN\n",
                 "new_output": "DataFrame 12:\n       a     b\n0  None  None\n1  None  None\n"
             },
