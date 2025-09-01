@@ -34,18 +34,12 @@ classification_prompt_version = 9
 # Start an automatic conversation with the llm
 # Only with this option set to True, corresponding issues
 # will be considered.
-<<<<<<< HEAD
-ref_issues = False
-=======
-ref_issues = True
-<<<<<<< HEAD
->>>>>>> refs/remotes/origin/main
-ref_comments = False
-=======
-ref_comments = True
->>>>>>> refs/remotes/origin/main
 
-automatic_chat = True
+ref_issues = True
+ref_comments = True
+
+
+automatic_chat = False
 
 # KEEP THIS AT THE END: log the current configuration
 current_globals = set(globals().keys())
