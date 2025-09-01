@@ -37,7 +37,7 @@ classification_prompt_version = 9
 ref_issues = True
 ref_comments = True
 
-automatic_chat = True
+automatic_chat = False
 
 # KEEP THIS AT THE END: log the current configuration
 current_globals = set(globals().keys())
