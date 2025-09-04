@@ -101,9 +101,6 @@ Your tasks is to determine whether this change accidentally introduces a regress
 # Details about the pull request
 {pr_details}
 
-# Description of the pull request
-{pr_body}
-
 # Description of the related issues
 {rel_issues}
 
@@ -164,7 +161,6 @@ Explain your reasoning and then give your answers in the following format:
                                     self.fut_qualified_names),
                                 docstrings=self.docstrings,
                                 pr_details=self.extract_pr_details(),
-                                pr_body=self.pr.github_pr.body,
                                 rel_issues=self.extract_reference_issues(),
                                 rel_comments=self.extract_reference_comments(),
                                 diff=self.pr.get_full_diff(),
