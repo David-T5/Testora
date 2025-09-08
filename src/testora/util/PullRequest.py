@@ -1,9 +1,13 @@
 import requests
 from unidiff import PatchSet
-import urllib.request
+import re
 
-from typing import List, Dict
-from testora.util.Logs import append_event, PullRequestReferencesEvent
+from collections.abc import Generator
+from github.Issue import Issue
+from github.PullRequest import PullRequest
+from github.GithubException import UnknownObjectException
+from re import Pattern
+from typing import List, Tuple
 
 from testora.util.PythonCodeUtil import equal_modulo_docstrings, extract_target_function_by_range, get_name_of_defined_function
 from testora import Config
@@ -179,182 +183,79 @@ class PullRequest:
                             line.target_line_no)
     
 
-    def get_reference_issues(self) -> List:
-        issues = []
-        reference_issues = self._scan_for_reference_issues(self.github_pr.body)
-
-        for issue_nb in reference_issues:
-            issue = {}
-            issue["issue_nb"] = issue_nb
-            issue["issue"] = self.github_repo.get_issue(issue_nb)
-            issues.append(issue)
-          
-        return issues
-
+    def _get_reference_patterns_for_issues_and_pulls(self) -> List[Pattern]:
+        patterns: List[Pattern] = []
+        patterns.append(re.compile('gh-[0-9]+'))
+        patterns.append(re.compile('GH-[0-9]+'))
+        patterns.append(re.compile('#[0-9]+'))
+        return patterns
     
-    def get_reference_comments(self) -> List:
-        comments = []
-        reference_comments = self._scan_for_reference_comments()
+    
+    def _get_reference_patterns_for_comments(self) -> List[Pattern]:
+        patterns: List[Pattern] = []
+        patterns.append(re.compile('[0-9]+#discussion_r[0-9]+'))
+        patterns.append(re.compile('[0-9]+#issuecomment-[0-9]+'))
+        return patterns
 
-        for elem in reference_comments:
-            comment = {}
-            if "issue" in elem:
-                issue_nb = elem["issue"]
-                issue = self.github_repo.get_issue(issue_nb)
-                comment_nb = elem["comment_nb"]
-                comment["issue"] = issue_nb
-                comment["comment_nb"] = comment_nb
-                comment["content"] = issue.get_comment(comment_nb)
-            elif "pull" in elem:
-                pull_nb = elem["pull"]
-                pull = self.github_repo.get_pull(pull_nb)
-                comment_nb = elem["comment_nb"]
-                comment["pull"] = pull_nb
-                comment["comment_nb"] = comment_nb
-                comment["content"] = pull.get_comment(comment_nb)
-            else:
-                raise RuntimeError("Neither pull or issue is a valid key in the elem dict")          
-            
-            comments.append(comment)
+
+    def _get_reference_comment_strings(self) -> List[List[str]]:
+        patterns: List[Pattern] = self._get_reference_patterns_for_comments()
+        pattern_results: List[List[str]] = []
+        for pattern in patterns:
+            # Remove duplicates from the findall() result
+            result = list(set(pattern.findall(self.github_pr.body)))
+            pattern_results.append(result)
+        return pattern_results
+        
+
+
+    def _get_reference_issue_and_pull_numbers(self) -> Generator[List[str], List[str], None]:
+        patterns: List[Pattern] = self._get_reference_patterns_for_issues_and_pulls()
+        for pattern in patterns:
+            yield pattern.findall(self.github_pr.body)
+
+
+    def get_reference_comments(self) -> List[str]:
+        comments: List[str] = []        
+        number: Pattern = re.compile('[0-9]+')
+        pattern_results: List[List[str]] = self._get_reference_comment_strings()
+        for pattern_result in pattern_results:
+            for reference in pattern_result:
+                tmp_numbers: List[str] = number.findall(reference)
+                github_object_nb: int = int(tmp_numbers[0])
+                comment_nb: int = int(tmp_numbers[1])
+                try:
+                    issue = self.github_repo.get_issue(github_object_nb)
+                    comments.append(issue.get_comment(comment_nb).body)
+                except UnknownObjectException:
+                    try:
+                        pull = self.github_repo.get_pull(github_object_nb)
+                        comments.append(pull.get_comment(comment_nb).body)
+                    except UnknownObjectException:
+                        raise RuntimeWarning(f"Repository {str(self.github_repo.name)} has no issue or PR with the number {github_object_nb}\n")
+                    
         return comments
 
-    
-    # Refrerenced issues normally start with a '#' or 'gh-'
-    # Returns: [<issue_num1>, <issue_num2>, ...], where issue_num* are integer
-    def _scan_for_reference_issues(self, pr_body: str) -> List:
-        result = []
-        numbers = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
-        state = 0
-        token  = ""
-        for i in range(len(pr_body)):
-            char = pr_body[i]
-            match state:
-                case 0:
-                    match char:
-                        case "g":
-                            state = 1
-                        case "#":
-                            state = 4
-                        case _:
-                            state = 0
-                case 1:
-                    match char:
-                        case "h":
-                            state = 3
-                        case _:
-                            state = 0
-                case 3: 
-                    match char:
-                        case "-":
-                            state = 4
-                        case _:
-                            state = 0
-                case 4:
-                    if char in numbers:
-                        token += char
-                        state = 4
-                    else:
-                        state = 5
-                case 5:
-                    # TODO: Consider to remove the restriction of lenght
-                    if len(token) >= 5:
-                        tmp = int(token)
-                        if tmp not in result:
-                            result.append(tmp)
-                        token = ""
-                        match char:
-                            case "g":
-                                state = 1
-                            case "#":
-                                state = 4
-                            case _:
-                                state = 0
-                    else:
-                        token = ""
-                        match char:
-                            case "g":
-                                state = 1
-                            case "#":
-                                state = 4
-                            case _:
-                                state = 0
-                case _:
-                    raise RuntimeError("Should never reach this")           
-        return result
 
+    def get_reference_issues_and_pulls(self) -> Tuple[List[Issue], List[PullRequest]]:
+        issues: List[Issue] = []
+        pull_requests: List[PullRequest] = []
+        object_numbers: List[int] = []
+        number: Pattern = re.compile('[0-9]+')
+        for pattern_result in self._get_reference_issue_and_pull_numbers():
+            for reference in pattern_result:
+                github_object_nb = int(number.findall(reference)[0])
+                if github_object_nb not in object_numbers:
+                    try:
+                        issue = self.github_repo.get_issue(github_object_nb)
+                        object_numbers.append(github_object_nb)
+                        issues.append(issue)
+                    except UnknownObjectException:
+                        try:
+                            pull = self.github_repo.get_pull(github_object_nb)
+                            object_numbers.append(github_object_nb)
+                            pull_requests.append(pull)
+                        except UnknownObjectException:
+                            raise RuntimeWarning(f"Repository {str(self.github_repo.name)} has no issue or PR with the number {github_object_nb}\n")
 
-    # Returns: [{"issue": <issue_num>, "comment_nb": <num>}, {"issue": <issue_num>, "comment_nb": <num>}, ...]
-    def _scan_for_reference_comments(self) -> List:
-        body = self.github_pr.body
-        result = []
-
-        issues_link = "https://github.com/scipy/scipy/issues/"
-        pull_link = "https://github.com/scipy/scipy/pull/"
-        
-        l1 = len(issues_link)
-        l2 = len(pull_link)
-
-        while True:
-            if issues_link in body:
-                tmp = body[body.find(issues_link) + l1:]
-                if "#issuecomment-" in tmp:
-                    pref, suff = tmp.split("#issuecomment-", maxsplit=1)
-                    issue_cmt = self._scan_for_comments(pref, suff, issue_comment=True)
-                    if issue_cmt != -1 and issue_cmt not in result:
-                        result.append(issue_cmt)
-                pre_suf = body.split(issues_link, maxsplit=1)
-                body = pre_suf[0] + pre_suf[1]
-
-            elif pull_link in body:
-                tmp = body[body.find(pull_link) + l2:]
-                if "#discussion_r" in tmp:
-                    pref, suff = tmp.split("#discussion_r", maxsplit=1)
-                    pull_cmt = self._scan_for_comments(pref, suff, issue_comment=False)
-                    if pull_cmt != -1 and pull_cmt not in result:
-                        result.append(pull_cmt)
-                pre_suf = body.split(pull_link, maxsplit=1)
-                body = pre_suf[0] + pre_suf[1]
-            else:
-                break
-            
-        return result
-    
-
-    def _scan_for_comments(self, pref: str, suff: str, issue_comment=False) -> Dict:
-        result = {}
-        if issue_comment:
-            result["issue"] = int(pref) 
-        else:
-            result["pull"] = int(pref)
-
-        suffix = suff
-        numbers = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
-        comment_nb = ""
-        state = 0
-        for i in range(len(suffix)):
-            char = suffix[i]
-            match state:
-                case 0:
-                    if char in numbers:
-                        comment_nb += char
-                        state = 1
-                    else:
-                        # Link has no valid comment number
-                        return -1
-                case 1:
-                    if char in numbers:
-                        comment_nb += char
-                        state = 1
-                    else:
-                        state = 2
-                case 2:
-                    if len(comment_nb) >= 9:
-                        result["comment_nb"] = int(comment_nb)
-                        comment_nb = ""
-                        return result
-                    else:
-                        # Link has no valid comment number
-                        return -1
-                case _:
-                    raise RuntimeError("Should never reach this")
-        raise RuntimeError("Should never reach this")
+        return issues, pull_requests
