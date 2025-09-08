@@ -210,4 +210,4 @@ Explain your reasoning and then give your answers in the following format:
             if line.strip() == "<ANSWER5>":
                 in_answer = 5
 
-        return is_relevant_change, is_deterministic, is_public, is_legal, is_surprising, True, correct_output
+        return is_relevant_change, is_deterministic, is_public, is_legal, is_surprising, True, True, correct_output
