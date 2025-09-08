@@ -56,18 +56,27 @@ class RegressionClassificationPromptV9:
     def extract_reference_issues(self) -> str:  
         if Config.ref_issues:
             issues_str = ""
-            issues = self.pr.get_reference_issues()
+            issues, pulls = self.pr.get_reference_issues_and_pulls()
 
             for issue in issues:
-                issue_body = issue["issue"].body
-                issue_nb = issue["issue_nb"]
-                issue_title = issue["issue"].title
+                issue_body = issue.body
+                issue_nb = issue.number
+                issue_title = issue.title
                 issues_str += f"## Issue {issue_nb}: {issue_title} \n"
-                # Limit String lenght: Max 10000 characters per issue body
-                issues_str += issue_body[:10000]
+                # Limit String lenght: Max 8000 characters per issue body
+                issues_str += issue_body[:8000]
                 issues_str += f"\n\n"
 
-            return issues_str[:30000]
+            for pull in pulls:
+                pull_body = pull.body
+                pull_nb = pull.number
+                pull_title = pull.title
+                issues_str += f"## Pull {pull_nb}: {pull_title} \n"
+                # Limit String lenght: Max 8000 characters per pull body
+                issues_str += pull_body[:8000]
+                issues_str += f"\n\n"
+
+            return issues_str[:32000]
         else:
             return "(omitted)"
         
@@ -77,13 +86,8 @@ class RegressionClassificationPromptV9:
             comments = self.pr.get_reference_comments()
 
             for comment in comments:
-                if "pull" in comment.keys():
-                    pull_nb = comment["pull"]
-                    comments_str += f"## Related comment from Pull {pull_nb}: \n"
-                elif "issue" in comment.keys():
-                    issue_nb = comment["issue"]
-                    comments_str += f"## Related comment from Issue {issue_nb}: \n"
-                comments_str += comment["content"].body
+                comments_str += comment
+                comments_str += "--------"
                 comments_str += f"\n\n"
             
             return comments_str
