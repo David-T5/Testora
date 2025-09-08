@@ -17,6 +17,7 @@ from testora.prompts.RegressionClassificationPromptV5 import RegressionClassific
 from testora.prompts.RegressionClassificationPromptV6 import RegressionClassificationPromptV6 
 from testora.prompts.RegressionClassificationPromptV7 import RegressionClassificationPromptV7
 from testora.prompts.RegressionClassificationPromptV9 import RegressionClassificationPromptV9
+from testora.prompts.RegressionClassificationPromptV10 import RegressionClassificationPromptV10
 from testora.prompts.RegressionTestGeneratorPrompt import RegressionTestGeneratorPrompt
 from testora.prompts.SelectExpectedBehaviorPrompt import SelectExpectedBehaviorPrompt
 from testora.util.ClonedRepoManager import ClonedRepoManager
@@ -49,6 +50,8 @@ elif Config.classification_prompt_version == 7:
     RegressionClassificationPrompt = RegressionClassificationPromptV7
 elif Config.classification_prompt_version == 9:
     RegressionClassificationPrompt = RegressionClassificationPromptV9 
+elif Config.classification_prompt_version == 10:
+    RegressionClassificationPrompt = RegressionClassificationPromptV10
 
 if Config.automatic_chat:
     FirstClassificationPrompt = RegressionClassificationPromptV4
@@ -328,7 +331,7 @@ def classify_regression(project_name, pr, changed_functions, docstrings, old_exe
         additional_messages.append({"role": "user", "content": first_prompt.create_prompt()})
         for raw_answer_sample in raw_answer:
             additional_messages.append({"role": "assistant", "content": str(raw_answer_sample)})
-            is_relevant_change, is_deterministic, is_public, is_legal, is_surprising, is_sufficient, correct_output = first_prompt.parse_answer(
+            is_relevant_change, is_deterministic, is_public, is_legal, is_surprising, is_confident, is_sufficient, correct_output = first_prompt.parse_answer(
             [raw_answer_sample])
             append_event(ClassificationEvent(pr_nb=pr.number,
                                              message="First Classification",
@@ -337,6 +340,7 @@ def classify_regression(project_name, pr, changed_functions, docstrings, old_exe
                                              is_public=is_public,
                                              is_legal=is_legal,
                                              is_surprising=is_surprising,
+                                             is_confident=is_confident,
                                              is_sufficient=is_sufficient,
                                              correct_output=correct_output,
                                              old_is_crash=is_crash(
@@ -357,7 +361,7 @@ def classify_regression(project_name, pr, changed_functions, docstrings, old_exe
 
     all_results = []
     for raw_answer_sample in raw_answer:
-        is_relevant_change, is_deterministic, is_public, is_legal, is_surprising, is_sufficient, correct_output = prompt.parse_answer(
+        is_relevant_change, is_deterministic, is_public, is_legal, is_surprising, is_confident, is_sufficient, correct_output = prompt.parse_answer(
             [raw_answer_sample])
         append_event(ClassificationEvent(pr_nb=pr.number,
                                          message="Classification",
@@ -366,6 +370,7 @@ def classify_regression(project_name, pr, changed_functions, docstrings, old_exe
                                          is_public=is_public,
                                          is_legal=is_legal,
                                          is_surprising=is_surprising,
+                                         is_confident=is_confident,
                                          is_sufficient=is_sufficient,
                                          correct_output=correct_output,
                                          old_is_crash=is_crash(
@@ -373,7 +378,7 @@ def classify_regression(project_name, pr, changed_functions, docstrings, old_exe
                                          new_is_crash=is_crash(new_execution.output)))
         result = is_relevant_change and is_deterministic and is_public and is_legal and is_surprising
         all_results.append(result)
-    return all_results
+    return all_results, is_confident
 
 
 def select_expected_behavior(project_name, pr, old_execution, new_execution, docstrings):
@@ -536,7 +541,7 @@ def check_pr(github_repo, cloned_repo_manager, pr):
 
         # if difference found, classify regression
         assert old_execution.code == new_execution.code
-        is_regression_bug = classify_regression(
+        is_regression_bug, _ = classify_regression(
             github_repo.name, pr, changed_functions, docstrings, old_execution, new_execution)[0]
 
         # if classified as regression bug, ask LLM which behavior is expected (to handle coincidental bug fixes)

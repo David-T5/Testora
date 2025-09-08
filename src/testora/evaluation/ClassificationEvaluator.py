@@ -130,7 +130,7 @@ def evaluate_against_ground_truth(cloned_repo_manager, project_name, pr, diff_te
     docstrings = retrieve_relevant_docstrings(
         cloned_repo_of_new_commit, new_execution.code)
 
-    all_predicted_as_unintended = classify_regression(project_name, pr,
+    all_predicted_as_unintended, is_confident = classify_regression(project_name, pr,
                                                       changed_functions,
                                                       docstrings,
                                                       old_execution, new_execution,
@@ -138,8 +138,11 @@ def evaluate_against_ground_truth(cloned_repo_manager, project_name, pr, diff_te
                                                       nb_samples=1)
     predictions = []
     for predicted_as_unintended in all_predicted_as_unintended:
-        predictions.append(
-            "unintended" if predicted_as_unintended else "intended")
+        if is_confident:
+            predictions.append(
+                "unintended" if predicted_as_unintended else "intended")
+        else:
+            predictions.append("unsure")
 
     append_event(ClassifierEvalEvent(
         pr_nb=pr.number,
