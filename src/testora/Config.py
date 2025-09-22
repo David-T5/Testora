@@ -36,8 +36,8 @@ classification_prompt_version = 9
 # Only with this option set to True, corresponding issues
 # will be considered.
 
-ref_issues = True
-ref_comments = True
+ref_issues = False
+ref_comments = False
 
 automatic_chat = False
 
