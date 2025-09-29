@@ -18,6 +18,7 @@ from testora.prompts.RegressionClassificationPromptV6 import RegressionClassific
 from testora.prompts.RegressionClassificationPromptV7 import RegressionClassificationPromptV7
 from testora.prompts.RegressionClassificationPromptV9 import RegressionClassificationPromptV9
 from testora.prompts.RegressionClassificationPromptV10 import RegressionClassificationPromptV10
+from testora.prompts.RegressionClassificationPromptV12 import RegressionClassificationPromptV12
 from testora.prompts.RegressionTestGeneratorPrompt import RegressionTestGeneratorPrompt
 from testora.prompts.SelectExpectedBehaviorPrompt import SelectExpectedBehaviorPrompt
 from testora.util.ClonedRepoManager import ClonedRepoManager
@@ -52,6 +53,8 @@ elif Config.classification_prompt_version == 9:
     RegressionClassificationPrompt = RegressionClassificationPromptV9 
 elif Config.classification_prompt_version == 10:
     RegressionClassificationPrompt = RegressionClassificationPromptV10
+elif Config.classification_prompt_version == 12:
+    RegressionClassificationPrompt = RegressionClassificationPromptV12
 
 if Config.automatic_chat:
     FirstClassificationPrompt = RegressionClassificationPromptV4

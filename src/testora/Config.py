@@ -31,7 +31,7 @@ classification_temp = 1.0
 # classification_temp = 0.6
 
 # different prompts for classification task
-classification_prompt_version = 9
+classification_prompt_version = 12
 
 # Start an automatic conversation with the llm
 # Only with this option set to True, corresponding issues
