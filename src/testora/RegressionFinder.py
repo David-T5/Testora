@@ -180,7 +180,7 @@ def is_crash(output):
 
 
 def generate_tests_with_prompt(pr, prompt, model, nb_samples=1):
-    raw_answer = model.query(prompt, nb_samples)
+    raw_answer = model.query(prompt=prompt, additional_messages=[], nb_samples=nb_samples)
     append_event(LLMEvent(pr_nb=pr.number,
                  message="Raw answer", content="\n---(next sample)---".join(raw_answer)))
 
@@ -314,7 +314,6 @@ def classify_regression(project_name, pr, changed_functions, docstrings, old_exe
                                         test_code=old_execution.code,
                                         old_output=old_execution.output,
                                         new_output=new_execution.output))
-    
     if Config.automatic_chat:
         first_prompt = FirstClassificationPrompt(
             project_name, pr, changed_functions, docstrings, old_execution.code, old_execution.output, new_execution.output)
@@ -346,7 +345,6 @@ def classify_regression(project_name, pr, changed_functions, docstrings, old_exe
                                              old_is_crash=is_crash(
                                                  old_execution.output),
                                              new_is_crash=is_crash(new_execution.output)))
-
     prompt = RegressionClassificationPrompt(
         project_name, pr, changed_functions, docstrings, old_execution.code, old_execution.output, new_execution.output)
     raw_answer = llm.query(prompt,
@@ -385,7 +383,7 @@ def select_expected_behavior(project_name, pr, old_execution, new_execution, doc
     """Ask LLM which of two possible outputs is the expected behavior."""
     prompt = SelectExpectedBehaviorPrompt(
         project_name, old_execution.code, old_execution.output, new_execution.output, docstrings)
-    raw_answer = llm.query(prompt, temperature=Config.classification_temp)
+    raw_answer = llm.query(prompt, temperature=Config.classification_temp, additional_messages=[])
     append_event(LLMEvent(pr_nb=pr.number,
                           message="Raw answer", content="\n---(next sample)---".join(raw_answer)))
     expected_behavior = prompt.parse_answer(raw_answer)
@@ -453,7 +451,7 @@ def check_pr(github_repo, cloned_repo_manager, pr):
             undefined_refs = get_undefined_references(test)
             if undefined_refs:
                 prompt = UndefinedRefsFixingPrompt(test, undefined_refs)
-                raw_answer = llm.query(prompt)[0]
+                raw_answer = llm.query(prompt, additional_messages=[])[0]
                 append_event(LLMEvent(pr_nb=pr.number,
                                       message="Raw answer", content=raw_answer))
                 fixed_test = prompt.parse_answer(raw_answer)
@@ -541,8 +539,9 @@ def check_pr(github_repo, cloned_repo_manager, pr):
 
         # if difference found, classify regression
         assert old_execution.code == new_execution.code
-        is_regression_bug, _ = classify_regression(
-            github_repo.name, pr, changed_functions, docstrings, old_execution, new_execution)[0]
+        all_results, _ = classify_regression(
+            github_repo.name, pr, changed_functions, docstrings, old_execution, new_execution)
+        is_regression_bug = all_results[0]
 
         # if classified as regression bug, ask LLM which behavior is expected (to handle coincidental bug fixes)
         if is_regression_bug:
@@ -586,7 +585,7 @@ def filter_and_sort_prs_by_risk(github_prs, cloned_repo_manager):
     all_medium_risk_prs = []
     for chunk in chunks:
         prompt = PRRegressionBugRanking(chunk, cloned_repo_manager.repo_name)
-        raw_answer = llm.query(prompt)
+        raw_answer = llm.query(prompt, additional_messages=[])
         append_event(LLMEvent(pr_nb=0,
                               message="Raw answer", content="\n---(next sample)---".join(raw_answer)))
         ranking_result = prompt.parse_answer(raw_answer)

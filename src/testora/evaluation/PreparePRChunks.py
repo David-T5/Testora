@@ -48,11 +48,11 @@ def write_range_of_PR_tasks_into_database(project_name, project_id, start_pr_nb,
 if __name__ == "__main__":
     EvalTaskManager.initialize()
 
-    # write_range_of_PR_tasks_into_database(
-    #     "pandas", "pandas-dev/pandas", 60322, 300)
-
     write_range_of_PR_tasks_into_database(
-        "scipy", "scipy/scipy", 21646, 20)
+        "pandas", "pandas-dev/pandas", 59908, 30)
+
+    # write_range_of_PR_tasks_into_database(
+    #     "scipy", "scipy/scipy", 21646, 20)
 
     # write_range_of_PR_tasks_into_database(
     #     "keras", "keras-team/keras", 20711, 300)
