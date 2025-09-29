@@ -19,8 +19,9 @@ llm_risk_assessment = False
 fix_undefined_refs = True
 
 # model_version = "gpt-3.5-turbo-0125"
-model_version = "gpt-4o-mini-2024-07-18"
-# model_version = "gpt-5-mini"
+# model_version = "gpt-4o-mini-2024-07-18"
+model_version = "gpt-5-mini"
+# model_version = "gpt-5-nano"
 # model_version = "gpt-4o-2024-08-06"
 # model_version = "deepseek/deepseek-r1"
 
@@ -36,8 +37,8 @@ classification_prompt_version = 9
 # Only with this option set to True, corresponding issues
 # will be considered.
 
-ref_issues = False
-ref_comments = False
+ref_issues = True
+ref_comments = True
 
 automatic_chat = False
 
