@@ -31,15 +31,12 @@ classification_temp = 1.0
 # classification_temp = 0.6
 
 # different prompts for classification task
-classification_prompt_version = 12
-
-# Start an automatic conversation with the llm
-# Only with this option set to True, corresponding issues
-# will be considered.
+classification_prompt_version = 9
 
 ref_issues = True
 ref_comments = True
 
+# WARNING: Only works correctly for classification_prompt_version = 4 
 automatic_chat = False
 
 # KEEP THIS AT THE END: log the current configuration
