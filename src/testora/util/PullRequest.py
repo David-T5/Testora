@@ -188,6 +188,8 @@ class PullRequest:
         patterns.append(re.compile('gh-[0-9]+'))
         patterns.append(re.compile('GH-[0-9]+'))
         patterns.append(re.compile('#[0-9]+'))
+        patterns.append(re.compile('/pull/[0-9]+'))
+        patterns.append(re.compile('/issues/[0-9]+'))
         return patterns
     
     
