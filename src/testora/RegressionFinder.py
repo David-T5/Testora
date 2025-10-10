@@ -13,6 +13,7 @@ from testora.prompts.RegressionClassificationPromptV1 import RegressionClassific
 from testora.prompts.RegressionClassificationPromptV2 import RegressionClassificationPromptV2
 from testora.prompts.RegressionClassificationPromptV3 import RegressionClassificationPromptV3
 from testora.prompts.RegressionClassificationPromptV4 import RegressionClassificationPromptV4
+from testora.prompts.RegressionClassificationPromptV4_1 import RegressionClassificationPromptV4_1
 from testora.prompts.RegressionClassificationPromptV5 import RegressionClassificationPromptV5
 from testora.prompts.RegressionClassificationPromptV6 import RegressionClassificationPromptV6 
 from testora.prompts.RegressionClassificationPromptV7 import RegressionClassificationPromptV7
@@ -37,27 +38,38 @@ llm = LLMCache(OpenAIGPT())
 
 if Config.classification_prompt_version == 1:
     RegressionClassificationPrompt = RegressionClassificationPromptV1
+    SecondClassificationPrompt = RegressionClassificationPromptV1
 elif Config.classification_prompt_version == 2:
     RegressionClassificationPrompt = RegressionClassificationPromptV2
+    SecondClassificationPrompt = RegressionClassificationPromptV2
 elif Config.classification_prompt_version == 3:
     RegressionClassificationPrompt = RegressionClassificationPromptV3
+    SecondClassificationPrompt = RegressionClassificationPromptV3
 elif Config.classification_prompt_version == 4:
-    RegressionClassificationPrompt = RegressionClassificationPromptV4
+    if Config.automatic_chat:
+        RegressionClassificationPrompt = RegressionClassificationPromptV4
+        SecondClassificationPrompt = RegressionClassificationPromptV4_1
+    else:
+        RegressionClassificationPrompt = RegressionClassificationPromptV4
+        SecondClassificationPrompt = RegressionClassificationPromptV4
 elif Config.classification_prompt_version == 5:
     RegressionClassificationPrompt = RegressionClassificationPromptV5
+    SecondClassificationPrompt = RegressionClassificationPromptV5
 elif Config.classification_prompt_version == 6:
     RegressionClassificationPrompt = RegressionClassificationPromptV6
+    SecondClassificationPrompt = RegressionClassificationPromptV6
 elif Config.classification_prompt_version == 7:
     RegressionClassificationPrompt = RegressionClassificationPromptV7
+    SecondClassificationPrompt = RegressionClassificationPromptV7
 elif Config.classification_prompt_version == 9:
     RegressionClassificationPrompt = RegressionClassificationPromptV9 
+    SecondClassificationPrompt = RegressionClassificationPromptV9
 elif Config.classification_prompt_version == 10:
     RegressionClassificationPrompt = RegressionClassificationPromptV10
+    SecondClassificationPrompt = RegressionClassificationPromptV10
 elif Config.classification_prompt_version == 12:
     RegressionClassificationPrompt = RegressionClassificationPromptV12
-
-if Config.automatic_chat:
-    FirstClassificationPrompt = RegressionClassificationPromptV4
+    SecondClassificationPrompt = RegressionClassificationPromptV12
 
 def clean_output(output):
     # remove warnings caused by coverage measurements
@@ -317,42 +329,11 @@ def classify_regression(project_name, pr, changed_functions, docstrings, old_exe
                                         test_code=old_execution.code,
                                         old_output=old_execution.output,
                                         new_output=new_execution.output))
-    if Config.automatic_chat:
-        first_prompt = FirstClassificationPrompt(
-            project_name, pr, changed_functions, docstrings, old_execution.code, old_execution.output, new_execution.output)
-        raw_answer = llm.query(first_prompt,
-                               temperature=Config.classification_temp,
-                               no_cache=no_cache,
-                               nb_samples=nb_samples)
-        
-        append_event(LLMEvent(pr_nb=pr.number, 
-                          message="Raw answer", content="\n---(next sample)---".join(raw_answer)))
-        assert (nb_samples == len(raw_answer))
-
-        # Add first prompt and llm answers to the additional messages
-        additional_messages.append({"role": "user", "content": first_prompt.create_prompt()})
-        for raw_answer_sample in raw_answer:
-            additional_messages.append({"role": "assistant", "content": str(raw_answer_sample)})
-            is_relevant_change, is_deterministic, is_public, is_legal, is_surprising, is_confident, is_sufficient, correct_output = first_prompt.parse_answer(
-            [raw_answer_sample])
-            append_event(ClassificationEvent(pr_nb=pr.number,
-                                             message="First Classification",
-                                             is_relevant_change=is_relevant_change,
-                                             is_deterministic=is_deterministic,
-                                             is_public=is_public,
-                                             is_legal=is_legal,
-                                             is_surprising=is_surprising,
-                                             is_confident=is_confident,
-                                             is_sufficient=is_sufficient,
-                                             correct_output=correct_output,
-                                             old_is_crash=is_crash(
-                                                 old_execution.output),
-                                             new_is_crash=is_crash(new_execution.output)))
+    
     prompt = RegressionClassificationPrompt(
         project_name, pr, changed_functions, docstrings, old_execution.code, old_execution.output, new_execution.output)
     raw_answer = llm.query(prompt,
                            temperature=Config.classification_temp,
-                           additional_messages=additional_messages,
                            no_cache=no_cache,
                            nb_samples=nb_samples)
     
@@ -360,8 +341,11 @@ def classify_regression(project_name, pr, changed_functions, docstrings, old_exe
                           message="Raw answer", content="\n---(next sample)---".join(raw_answer)))
     assert (nb_samples == len(raw_answer))
 
+    # Add first prompt and llm answers to the additional messages
+    additional_messages.append({"role": "user", "content": prompt.create_prompt()})
     all_results = []
     for raw_answer_sample in raw_answer:
+        additional_messages.append({"role": "assistant", "content": str(raw_answer_sample)})
         is_relevant_change, is_deterministic, is_public, is_legal, is_surprising, is_confident, is_sufficient, correct_output = prompt.parse_answer(
             [raw_answer_sample])
         append_event(ClassificationEvent(pr_nb=pr.number,
@@ -377,8 +361,43 @@ def classify_regression(project_name, pr, changed_functions, docstrings, old_exe
                                          old_is_crash=is_crash(
                                              old_execution.output),
                                          new_is_crash=is_crash(new_execution.output)))
+        if not Config.automatic_chat:
+            result = is_relevant_change and is_deterministic and is_public and is_legal and is_surprising
+            all_results.append(result)
+
+    if Config.automatic_chat:
+        second_prompt = SecondClassificationPrompt(
+            project_name, pr, changed_functions, docstrings, old_execution.code, old_execution.output, new_execution.output)
+        raw_answer = llm.query(prompt,
+                           temperature=Config.classification_temp,
+                           additional_messages=additional_messages,
+                           no_cache=no_cache,
+                           nb_samples=nb_samples)
+        
+        append_event(LLMEvent(pr_nb=pr.number, 
+                          message="Raw answer", content="\n---(next sample)---".join(raw_answer)))
+        assert (nb_samples == len(raw_answer))
+
+        for raw_answer_sample in raw_answer:
+            is_relevant_change, is_deterministic, is_public, is_legal, is_surprising, is_confident, is_sufficient, correct_output = second_prompt.parse_answer(
+                [raw_answer_sample])
+            append_event(ClassificationEvent(pr_nb=pr.number,
+                                             message="Second Classification",
+                                             is_relevant_change=is_relevant_change,
+                                             is_deterministic=is_deterministic,
+                                             is_public=is_public,
+                                             is_legal=is_legal,
+                                             is_surprising=is_surprising,
+                                             is_confident=is_confident,
+                                             is_sufficient=is_sufficient,
+                                             correct_output=correct_output,
+                                             old_is_crash=is_crash(
+                                                 old_execution.output),
+                                             new_is_crash=is_crash(new_execution.output)))
         result = is_relevant_change and is_deterministic and is_public and is_legal and is_surprising
         all_results.append(result)
+
+
     return all_results, is_confident
 
 
