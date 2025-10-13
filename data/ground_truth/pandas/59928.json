@@ -1,0 +1,24 @@
+{
+    "pr_number": 59928,
+    "log_file": "59928_2025-09-24 14:57:23.json",
+    "differentiating_tests": [
+        {
+            "test": {
+                "test_code": "import pandas as pd\n# Example 16:\n# Trimming a list with None and empty strings\nstrings = [None, '', '   ']\ntrimmed_strings = pd.core.indexes.base.trim_front(strings)",
+                "old_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\n",
+                "new_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nTraceback (most recent call last):\n  File \"/tmp/Testora/Testora_test_code.py\", line 5, in <module>\n    trimmed_strings = pd.core.indexes.base.trim_front(strings)\n                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/pandas/pandas/core/indexes/base.py\", line 7586, in trim_front\n    smallest_leading_space = min(len(x) - len(x.lstrip()) for x in strings)\n                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/pandas/pandas/core/indexes/base.py\", line 7586, in <genexpr>\n    smallest_leading_space = min(len(x) - len(x.lstrip()) for x in strings)\n                                 ^^^^^^\nTypeError: object of type 'NoneType' has no len()\n"
+            },
+            "label": "coincidental fix",
+            "comment": "None values can't be trimmed. Error of the new output is helpful, if None values are in the strings array. Throwing an error prevents unintended behavior."
+        },
+        {
+            "test": {
+                "test_code": "import pandas as pd\n# Example 17:\n# Trimming mixed types (string and None)\nstrings = ['   Hello', None, '   World']\ntrimmed_strings = pd.core.indexes.base.trim_front(strings)",
+                "old_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\n",
+                "new_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nTraceback (most recent call last):\n  File \"/tmp/Testora/Testora_test_code.py\", line 5, in <module>\n    trimmed_strings = pd.core.indexes.base.trim_front(strings)\n                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/pandas/pandas/core/indexes/base.py\", line 7586, in trim_front\n    smallest_leading_space = min(len(x) - len(x.lstrip()) for x in strings)\n                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/pandas/pandas/core/indexes/base.py\", line 7586, in <genexpr>\n    smallest_leading_space = min(len(x) - len(x.lstrip()) for x in strings)\n                                 ^^^^^^\nTypeError: object of type 'NoneType' has no len()\n"
+            },
+            "label": "coincidental fix",
+            "comment": "None values can't be trimmed. Error of the new output is helpful, if None values are in the strings array. Throwing an error prevents unintended behavior."
+        }
+    ]
+}

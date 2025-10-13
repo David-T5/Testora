@@ -1,0 +1,15 @@
+{
+    "pr_number": 59999,
+    "log_file": "59999_2025-10-02 10:06:38.json",
+    "differentiating_tests": [
+        {
+            "test": {
+                "test_code": "# Corner Example 1:\n# The case that motivated the change: inner column is ALL-NA. Try permutations of groupby.sort and value_counts.sort.\nimport pandas as pd\nimport numpy as np\n\ndf = pd.DataFrame({\"a\": [2, 1, 1], \"b\": np.nan})\nprint(\"Input DataFrame:\\n\", df, sep=\"\")\n\nfor groupby_sort in (True, False):\n    for vc_sort in (True, False):\n        for dropna in (True, False):\n            res = df.groupby(\"a\", sort=groupby_sort).value_counts(sort=vc_sort, dropna=dropna)",
+                "old_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nInput DataFrame:\n   a   b\n0  2 NaN\n1  1 NaN\n2  1 NaN\nTraceback (most recent call last):\n  File \"/tmp/Testora/Testora_test_code.py\", line 12, in <module>\n    res = df.groupby(\"a\", sort=groupby_sort).value_counts(sort=vc_sort, dropna=dropna)\n          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/pandas/pandas/core/groupby/generic.py\", line 2723, in value_counts\n    return self._value_counts(subset, normalize, sort, ascending, dropna)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/pandas/pandas/core/groupby/groupby.py\", line 2535, in _value_counts\n    result_series = cast(Series, gb.size())\n                                 ^^^^^^^^^\n  File \"/home/pandas/pandas/core/groupby/groupby.py\", line 2747, in size\n    result = self._grouper.size()\n             ^^^^^^^^^^^^^^^^^^^^\n  File \"/home/pandas/pandas/core/groupby/ops.py\", line 696, in size\n    ids = self.ids\n          ^^^^^^^^\n  File \"/home/pandas/pandas/core/groupby/ops.py\", line 750, in ids\n    return self.result_index_and_ids[1]\n           ^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"pandas/_libs/properties.pyx\", line 36, in pandas._libs.properties.CachedProperty.__get__\n    val = self.fget(obj)\n  File \"/home/pandas/pandas/core/groupby/ops.py\", line 769, in result_index_and_ids\n    result_index, ids = self._ob_index_and_ids(\n                        ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/pandas/pandas/core/groupby/ops.py\", line 884, in _ob_index_and_ids\n    ob_ids = np.where(ob_ids == -1, -1, index.take(ob_ids))\n                                        ^^^^^^^^^^^^^^^^^^\nIndexError: cannot do a non-empty take from an empty axes.\n",
+                "new_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nInput DataFrame:\n   a   b\n0  2 NaN\n1  1 NaN\n2  1 NaN\n"
+            },
+            "label": "intended",
+            "comment": "This test case is similar to the added test case in the pr"
+        }
+    ]
+}

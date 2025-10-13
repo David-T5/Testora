@@ -1,0 +1,51 @@
+{
+    "pr_number": 60173,
+    "log_file": "60173_2025-10-06 10:18:41.json",
+    "differentiating_tests": [
+        {
+            "test": {
+                "test_code": "# Corner Example 10:\n# Using the deprecated storage option repeatedly to show repeated warnings behavior\nimport warnings\nimport pandas as pd\n\nwarnings.simplefilter(\"always\")  # show all warnings by default for this example\ncatches = []\nfor i in range(3):\n    with warnings.catch_warnings(record=True) as w:\n        warnings.simplefilter(\"always\")\n        _ = pd.StringDtype(\"pyarrow_numpy\")\n        catches.append(len(w))\n\nprint(\"Number of warnings captured for each repeated construction:\", catches)",
+                "old_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nNumber of warnings captured for each repeated construction: [0, 0, 0]\n",
+                "new_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nNumber of warnings captured for each repeated construction: [1, 1, 1]\n"
+            },
+            "label": "intended",
+            "comment": ""
+        },
+        {
+            "test": {
+                "test_code": "# Example 1:\n# Create a StringDtype explicitly with storage=\"pyarrow_numpy\" and capture the warning.\nimport warnings\nimport pandas as pd\n\nprint(\"Example 1: Construct pd.StringDtype(storage='pyarrow_numpy') and capture warnings\")\nwith warnings.catch_warnings(record=True) as w:\n    warnings.simplefilter(\"always\")\n    dtype_obj = pd.StringDtype(storage=\"pyarrow_numpy\")\n    # Collect any warnings emitted\n    warnings_emitted = [str(x.message) for x in w]\n\nprint(\"Constructed dtype object:\", dtype_obj)\nprint(\"Has attribute 'storage' ->\", hasattr(dtype_obj, \"storage\") and dtype_obj.storage)\nprint(\"Warnings captured (count):\", len(warnings_emitted))\nfor i, msg in enumerate(warnings_emitted, 1):\n    print(f\" Warning {i}:\", msg)",
+                "old_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nExample 1: Construct pd.StringDtype(storage='pyarrow_numpy') and capture warnings\nConstructed dtype object: str\nHas attribute 'storage' -> pyarrow\nWarnings captured (count): 0\n",
+                "new_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nExample 1: Construct pd.StringDtype(storage='pyarrow_numpy') and capture warnings\nConstructed dtype object: str\nHas attribute 'storage' -> pyarrow\nWarnings captured (count): 1\n Warning 1: The 'pyarrow_numpy' storage option name is deprecated and will be removed in pandas 3.0. Use 'pd.StringDtype(storage=\"pyarrow\", na_value-np.nan)' to construct the same dtype.\nOr enable the 'pd.options.future.infer_string = True' option globally and use the \"str\" alias as a shorthand notation to specify a dtype (instead of \"string[pyarrow_numpy]\").\n"
+            },
+            "label": "intended",
+            "comment": ""
+        },
+        {
+            "test": {
+                "test_code": "# Example 2:\n# Use the public helper pandas_dtype to construct from the string \"string[pyarrow_numpy]\".\nimport warnings\nimport pandas as pd\n\nprint(\"Example 2: pd.api.types.pandas_dtype('string[pyarrow_numpy]') and capture warnings\")\nwith warnings.catch_warnings(record=True) as w:\n    warnings.simplefilter(\"always\")\n    dtype_from_string = pd.api.types.pandas_dtype(\"string[pyarrow_numpy]\")\n    warnings_emitted = [str(x.message) for x in w]\n\nprint(\"Result dtype:\", dtype_from_string)\nprint(\"If dtype has 'storage':\", hasattr(dtype_from_string, \"storage\") and dtype_from_string.storage)\nprint(\"Warnings captured (count):\", len(warnings_emitted))\nfor i, msg in enumerate(warnings_emitted, 1):\n    print(f\" Warning {i}:\", msg)",
+                "old_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nExample 2: pd.api.types.pandas_dtype('string[pyarrow_numpy]') and capture warnings\nResult dtype: str\nIf dtype has 'storage': pyarrow\nWarnings captured (count): 0\n",
+                "new_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nExample 2: pd.api.types.pandas_dtype('string[pyarrow_numpy]') and capture warnings\nResult dtype: str\nIf dtype has 'storage': pyarrow\nWarnings captured (count): 1\n Warning 1: The 'pyarrow_numpy' storage option name is deprecated and will be removed in pandas 3.0. Use 'pd.StringDtype(storage=\"pyarrow\", na_value-np.nan)' to construct the same dtype.\nOr enable the 'pd.options.future.infer_string = True' option globally and use the \"str\" alias as a shorthand notation to specify a dtype (instead of \"string[pyarrow_numpy]\").\n"
+            },
+            "label": "intended",
+            "comment": ""
+        },
+        {
+            "test": {
+                "test_code": "# Example 6:\n# Demonstrate that the deprecated name still routes through the dtype constructor:\n# call the classmethod-like construction by passing the string to pd.StringDtype.__str__ generator via pandas_dtype.\nimport warnings\nimport pandas as pd\n\nprint(\"Example 6: pandas_dtype with 'string[pyarrow_numpy]' vs constructing with storage='pyarrow'\")\nwith warnings.catch_warnings(record=True) as w:\n    warnings.simplefilter(\"always\")\n    a = pd.api.types.pandas_dtype(\"string[pyarrow_numpy]\")\n    b = pd.StringDtype(storage=\"pyarrow\")\n    warnings_emitted = [str(x.message) for x in w]\n\nprint(\"dtype from 'string[pyarrow_numpy]':\", a)\nprint(\"dtype from storage='pyarrow'        :\", b)\nprint(\"Do they compare equal?:\", a == b)\nprint(\"Warnings captured (count):\", len(warnings_emitted))\nfor msg in warnings_emitted:\n    print(\" Warning:\", msg)",
+                "old_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nExample 6: pandas_dtype with 'string[pyarrow_numpy]' vs constructing with storage='pyarrow'\ndtype from 'string[pyarrow_numpy]': str\ndtype from storage='pyarrow'        : string\nDo they compare equal?: False\nWarnings captured (count): 0\n",
+                "new_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nExample 6: pandas_dtype with 'string[pyarrow_numpy]' vs constructing with storage='pyarrow'\ndtype from 'string[pyarrow_numpy]': str\ndtype from storage='pyarrow'        : string\nDo they compare equal?: False\nWarnings captured (count): 1\n Warning: The 'pyarrow_numpy' storage option name is deprecated and will be removed in pandas 3.0. Use 'pd.StringDtype(storage=\"pyarrow\", na_value-np.nan)' to construct the same dtype.\nOr enable the 'pd.options.future.infer_string = True' option globally and use the \"str\" alias as a shorthand notation to specify a dtype (instead of \"string[pyarrow_numpy]\").\n"
+            },
+            "label": "intended",
+            "comment": ""
+        },
+        {
+            "test": {
+                "test_code": "# Example 9:\n# Compare two constructions where one uses the deprecated storage name and verify equality after deprecation-handling.\nimport warnings\nimport pandas as pd\n\nprint(\"Example 9: Compare pd.StringDtype(storage='pyarrow_numpy') and pd.StringDtype(storage='pyarrow')\")\nwith warnings.catch_warnings(record=True) as w:\n    warnings.simplefilter(\"always\")\n    dtype_old = pd.StringDtype(storage=\"pyarrow_numpy\")\n    dtype_new = pd.StringDtype(storage=\"pyarrow\")\n    warnings_emitted = [str(x.message) for x in w]\n\nprint(\"Old-constructed dtype:\", dtype_old)\nprint(\"New-constructed dtype:\", dtype_new)\nprint(\"Equality:\", dtype_old == dtype_new)\nprint(\"Warnings captured (count):\", len(warnings_emitted))\nfor msg in warnings_emitted:\n    print(\" Warning:\", msg)",
+                "old_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nExample 9: Compare pd.StringDtype(storage='pyarrow_numpy') and pd.StringDtype(storage='pyarrow')\nOld-constructed dtype: str\nNew-constructed dtype: string\nEquality: False\nWarnings captured (count): 0\n",
+                "new_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nExample 9: Compare pd.StringDtype(storage='pyarrow_numpy') and pd.StringDtype(storage='pyarrow')\nOld-constructed dtype: str\nNew-constructed dtype: string\nEquality: False\nWarnings captured (count): 1\n Warning: The 'pyarrow_numpy' storage option name is deprecated and will be removed in pandas 3.0. Use 'pd.StringDtype(storage=\"pyarrow\", na_value-np.nan)' to construct the same dtype.\nOr enable the 'pd.options.future.infer_string = True' option globally and use the \"str\" alias as a shorthand notation to specify a dtype (instead of \"string[pyarrow_numpy]\").\n"
+            },
+            "label": "intended",
+            "comment": ""
+        }
+    ]
+}

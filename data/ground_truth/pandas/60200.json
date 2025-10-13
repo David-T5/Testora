@@ -1,0 +1,69 @@
+{
+    "pr_number": 60200,
+    "log_file": "60200_2025-10-07 13:00:31.json",
+    "differentiating_tests": [
+        {
+            "test": {
+                "test_code": "# Example 1:\n# Basic: Series.ndim is 1 and has runtime type int; also print the declared return annotation.\nimport pandas as pd\nfrom typing import get_type_hints\n\ns = pd.Series([10, 20, 30])\nnd = s.ndim\nprint(\"Series:\", s.tolist())\nprint(\"ndim value:\", nd)\nprint(\"type(ndim):\", type(nd))\nprint(\"ndim == 1:\", nd == 1)\nprint(\"isinstance(ndim, int):\", isinstance(nd, int))\n# Inspect the declared return type on the property fget\nann = get_type_hints(type(s).ndim.fget)\nprint(\"declared return annotation for Series.ndim:\", ann.get(\"return\"))",
+                "old_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nSeries: [10, 20, 30]\nndim value: 1\ntype(ndim): <class 'int'>\nndim == 1: True\nisinstance(ndim, int): True\ndeclared return annotation for Series.ndim: typing.Literal[1]\n",
+                "new_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nSeries: [10, 20, 30]\nndim value: 1\ntype(ndim): <class 'int'>\nndim == 1: True\nisinstance(ndim, int): True\ndeclared return annotation for Series.ndim: <class 'int'>\n"
+            },
+            "label": "intended",
+            "comment": ""
+        },
+        {
+            "test": {
+                "test_code": "# Example 2:\n# Basic: Index.ndim is 1 and declared as int on the property.\nimport pandas as pd\nfrom typing import get_type_hints\n\nidx = pd.Index([\"a\", \"b\", \"c\"])\nprint(\"Index:\", list(idx))\nprint(\"ndim value:\", idx.ndim)\nprint(\"type(idx.ndim):\", type(idx.ndim))\nann = get_type_hints(type(idx).ndim.fget)\nprint(\"declared return annotation for Index.ndim:\", ann.get(\"return\"))",
+                "old_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nIndex: ['a', 'b', 'c']\nndim value: 1\ntype(idx.ndim): <class 'int'>\ndeclared return annotation for Index.ndim: typing.Literal[1]\n",
+                "new_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nIndex: ['a', 'b', 'c']\nndim value: 1\ntype(idx.ndim): <class 'int'>\ndeclared return annotation for Index.ndim: <class 'int'>\n"
+            },
+            "label": "intended",
+            "comment": ""
+        },
+        {
+            "test": {
+                "test_code": "# Example 3:\n# RangeIndex (special index type) still exposes ndim == 1.\nimport pandas as pd\nfrom typing import get_type_hints\n\nr = pd.RangeIndex(start=0, stop=5, step=1)\nprint(\"RangeIndex:\", r)\nprint(\"ndim value:\", r.ndim)\nprint(\"type(r.ndim):\", type(r.ndim))\nann = get_type_hints(type(r).ndim.fget)\nprint(\"declared return annotation for RangeIndex.ndim:\", ann.get(\"return\"))",
+                "old_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nRangeIndex: RangeIndex(start=0, stop=5, step=1)\nndim value: 1\ntype(r.ndim): <class 'int'>\ndeclared return annotation for RangeIndex.ndim: typing.Literal[1]\n",
+                "new_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nRangeIndex: RangeIndex(start=0, stop=5, step=1)\nndim value: 1\ntype(r.ndim): <class 'int'>\ndeclared return annotation for RangeIndex.ndim: <class 'int'>\n"
+            },
+            "label": "intended",
+            "comment": ""
+        },
+        {
+            "test": {
+                "test_code": "# Example 6:\n# Explore annotations via typing.get_type_hints on the base mixin class to demonstrate the change to 'int'.\nimport pandas as pd\nfrom typing import get_type_hints\nimport pandas.core.base as base_mod\n\n# Access the IndexOpsMixin.ndim fget annotation directly\nann = get_type_hints(base_mod.IndexOpsMixin.ndim.fget)\nprint(\"IndexOpsMixin.ndim declared return annotation:\", ann.get(\"return\"))",
+                "old_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nIndexOpsMixin.ndim declared return annotation: typing.Literal[1]\n",
+                "new_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nIndexOpsMixin.ndim declared return annotation: <class 'int'>\n"
+            },
+            "label": "intended",
+            "comment": ""
+        },
+        {
+            "test": {
+                "test_code": "# Example 7:\n# MultiIndex still reports ndim == 1 (inherited behavior) and annotation is int.\nimport pandas as pd\nfrom typing import get_type_hints\n\nmi = pd.MultiIndex.from_tuples([(0, \"a\"), (1, \"b\")])\nprint(\"MultiIndex tuples:\", list(mi))\nprint(\"mi.ndim:\", mi.ndim)\nprint(\"type(mi.ndim):\", type(mi.ndim))\nann = get_type_hints(type(mi).ndim.fget)\nprint(\"declared return annotation for MultiIndex.ndim:\", ann.get(\"return\"))",
+                "old_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nMultiIndex tuples: [(0, 'a'), (1, 'b')]\nmi.ndim: 1\ntype(mi.ndim): <class 'int'>\ndeclared return annotation for MultiIndex.ndim: typing.Literal[1]\n",
+                "new_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nMultiIndex tuples: [(0, 'a'), (1, 'b')]\nmi.ndim: 1\ntype(mi.ndim): <class 'int'>\ndeclared return annotation for MultiIndex.ndim: <class 'int'>\n"
+            },
+            "label": "intended",
+            "comment": ""
+        },
+        {
+            "test": {
+                "test_code": "# Example 11:\n# Corner: Empty Series -> ndim still 1 and typed as int.\nimport pandas as pd\nfrom typing import get_type_hints\n\ns = pd.Series([], dtype=float)\nprint(\"Empty Series:\", s)\nprint(\"s.ndim:\", s.ndim)\nprint(\"type(s.ndim):\", type(s.ndim))\nann = get_type_hints(type(s).ndim.fget)\nprint(\"declared return annotation for empty Series.ndim:\", ann.get(\"return\"))",
+                "old_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nEmpty Series: Series([], dtype: float64)\ns.ndim: 1\ntype(s.ndim): <class 'int'>\ndeclared return annotation for empty Series.ndim: typing.Literal[1]\n",
+                "new_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nEmpty Series: Series([], dtype: float64)\ns.ndim: 1\ntype(s.ndim): <class 'int'>\ndeclared return annotation for empty Series.ndim: <class 'int'>\n"
+            },
+            "label": "intended",
+            "comment": ""
+        },
+        {
+            "test": {
+                "test_code": "# Example 20:\n# Corner: Inspecting annotations on an IndexOpsMixin-derived class where the property is inherited.\nimport pandas as pd\nfrom typing import get_type_hints\n\n# DataFrame.columns is an Index; get annotation through the Index class fget\nann = get_type_hints(pd.Index.ndim.fget)\nprint(\"Annotation for pd.Index.ndim:\", ann.get(\"return\"))",
+                "old_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nAnnotation for pd.Index.ndim: typing.Literal[1]\n",
+                "new_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nAnnotation for pd.Index.ndim: <class 'int'>\n"
+            },
+            "label": "intended",
+            "comment": ""
+        }
+    ]
+}

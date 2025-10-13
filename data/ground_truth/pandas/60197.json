@@ -1,0 +1,149 @@
+    "pr_number": 60197,
+    "log_file": "60197_2025-10-07 13:00:31.json",
+    "differentiating_tests": [
+        {
+            "test": {
+                "test_code": "# Example 1:\n# Simple Series ndim value and annotation introspection\nimport pandas as pd\nimport typing\nimport inspect\n\ns = pd.Series([10, 20, 30])\nprint(\"Series s:\", s.tolist())\nprint(\"s.ndim value:\", s.ndim, \"(should be 1)\")\n\n# Inspect runtime type of the value\nprint(\"type(s.ndim):\", type(s.ndim))\n\n# Inspect the annotated return type of the property fget\nfget = pd.Series.ndim.fget  # property fget function\nhints = typing.get_type_hints(fget)\nprint(\"typing.get_type_hints(pd.Series.ndim.fget):\", hints)",
+                "old_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nSeries s: [10, 20, 30]\ns.ndim value: 1 (should be 1)\ntype(s.ndim): <class 'int'>\ntyping.get_type_hints(pd.Series.ndim.fget): {'return': typing.Literal[1]}\n",
+                "new_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nSeries s: [10, 20, 30]\ns.ndim value: 1 (should be 1)\ntype(s.ndim): <class 'int'>\ntyping.get_type_hints(pd.Series.ndim.fget): {'return': <class 'int'>}\n"
+            },
+            "label": "intended",
+            "comment": ""
+        },
+        {
+            "test": {
+                "test_code": "# Example 3:\n# Index ndim annotation and typing.get_origin / get_args behavior\nimport pandas as pd\nimport typing\n\nidx = pd.Index([100, 200])\nprint(\"Index idx:\", idx.tolist())\nprint(\"idx.ndim value:\", idx.ndim)\n\n# Introspect the annotation of the Index property fget\nfget_idx = pd.Index.ndim.fget\nhints_idx = typing.get_type_hints(fget_idx)\nannot = hints_idx.get(\"return\")\nprint(\"Annotated return type for Index.ndim:\", annot)",
+                "old_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nIndex idx: [100, 200]\nidx.ndim value: 1\nAnnotated return type for Index.ndim: typing.Literal[1]\n",
+                "new_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nIndex idx: [100, 200]\nidx.ndim value: 1\nAnnotated return type for Index.ndim: <class 'int'>\n"
+            },
+            "label": "intended",
+            "comment": ""
+        },
+        {
+            "test": {
+                "test_code": "# Example 4:\n# Using inspect.signature to show the annotated return type for Series.ndim\nimport pandas as pd\nimport inspect\n\nfget = pd.Series.ndim.fget\nsig = inspect.signature(fget)\nprint(\"Signature of pd.Series.ndim.fget:\", sig)",
+                "old_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nSignature of pd.Series.ndim.fget: (self) -> 'Literal[1]'\n",
+                "new_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nSignature of pd.Series.ndim.fget: (self) -> 'int'\n"
+            },
+            "label": "intended",
+            "comment": ""
+        },
+        {
+            "test": {
+                "test_code": "# Example 5:\n# Programmatically detect whether the annotation uses typing.Literal or not\nimport pandas as pd\nimport typing\n\nfget = pd.Series.ndim.fget\nannot = typing.get_type_hints(fget).get(\"return\")\n\nis_literal = typing.get_origin(annot) is typing.Literal\nprint(\"Annotated return type:\", annot)\nprint(\"Is annotation typing.Literal?:\", is_literal)\nif is_literal:\n    print(\"Literal args:\", typing.get_args(annot))\nelse:\n    print(\"Not a Literal; likely a plain int\")",
+                "old_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nAnnotated return type: typing.Literal[1]\nIs annotation typing.Literal?: True\nLiteral args: (1,)\n",
+                "new_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nAnnotated return type: <class 'int'>\nIs annotation typing.Literal?: False\nNot a Literal; likely a plain int\n"
+            },
+            "label": "intended",
+            "comment": ""
+        },
+        {
+            "test": {
+                "test_code": "# Example 8:\n# Use typing.get_type_hints on an instance bound attribute fget (still the same fget)\nimport pandas as pd\nimport typing\n\ns = pd.Series([0])\n# The annotation lives on the function object accessible via the class property fget\nfget = type(s).ndim.fget\nhints = typing.get_type_hints(fget)\nprint(\"typing.get_type_hints on bound instance's class fget:\", hints)",
+                "old_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\ntyping.get_type_hints on bound instance's class fget: {'return': typing.Literal[1]}\n",
+                "new_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\ntyping.get_type_hints on bound instance's class fget: {'return': <class 'int'>}\n"
+            },
+            "label": "intended",
+            "comment": ""
+        },
+        {
+            "test": {
+                "test_code": "# Example 10:\n# Compare annotated return types for Series.ndim and DataFrame.ndim\nimport pandas as pd\nimport typing\n\nseries_annot = typing.get_type_hints(pd.Series.ndim.fget).get(\"return\")\ndf_annot = typing.get_type_hints(pd.DataFrame.ndim.fget).get(\"return\")\nprint(\"Series.ndim annotated return type:\", series_annot)",
+                "old_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nSeries.ndim annotated return type: typing.Literal[1]\n",
+                "new_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nSeries.ndim annotated return type: <class 'int'>\n"
+            },
+            "label": "intended",
+            "comment": ""
+        },
+        {
+            "test": {
+                "test_code": "# Example 11:\n# Corner case: empty Series (no elements) - ndim remains 1; annotation introspection still works\nimport pandas as pd\nimport typing\n\ns_empty = pd.Series([], dtype=float)\nprint(\"Empty Series s_empty:\", s_empty.tolist())\nprint(\"s_empty.ndim:\", s_empty.ndim)\n\nannot = typing.get_type_hints(pd.Series.ndim.fget).get(\"return\")\nprint(\"Annotated return type for Series.ndim (empty Series case):\", annot)",
+                "old_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nEmpty Series s_empty: []\ns_empty.ndim: 1\nAnnotated return type for Series.ndim (empty Series case): typing.Literal[1]\n",
+                "new_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nEmpty Series s_empty: []\ns_empty.ndim: 1\nAnnotated return type for Series.ndim (empty Series case): <class 'int'>\n"
+            },
+            "label": "intended",
+            "comment": ""
+        },
+        {
+            "test": {
+                "test_code": "# Example 12:\n# Corner case: Series with NaN values - ndim is unaffected and annotation equals int\nimport pandas as pd\nimport math\nimport typing\n\ns_nan = pd.Series([1.0, float(\"nan\"), 3.0])\nprint(\"Series with NaN:\", s_nan.tolist())\nprint(\"s_nan.ndim:\", s_nan.ndim)\nprint(\"math.isnan(s_nan.iloc[1]):\", math.isnan(s_nan.iloc[1]))\n\nannot = typing.get_type_hints(pd.Series.ndim.fget).get(\"return\")\nprint(\"Annotation for Series.ndim:\", annot)",
+                "old_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nSeries with NaN: [1.0, nan, 3.0]\ns_nan.ndim: 1\nmath.isnan(s_nan.iloc[1]): True\nAnnotation for Series.ndim: typing.Literal[1]\n",
+                "new_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nSeries with NaN: [1.0, nan, 3.0]\ns_nan.ndim: 1\nmath.isnan(s_nan.iloc[1]): True\nAnnotation for Series.ndim: <class 'int'>\n"
+            },
+            "label": "intended",
+            "comment": ""
+        },
+        {
+            "test": {
+                "test_code": "# Example 13:\n# Corner case: Series containing None values - ndim remains 1\nimport pandas as pd\nimport typing\n\ns_none = pd.Series([None, None], dtype=object)\nprint(\"Series with None values:\", s_none.tolist())\nprint(\"s_none.ndim:\", s_none.ndim)\nprint(\"Annotation for Series.ndim:\", typing.get_type_hints(pd.Series.ndim.fget).get(\"return\"))",
+                "old_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nSeries with None values: [None, None]\ns_none.ndim: 1\nAnnotation for Series.ndim: typing.Literal[1]\n",
+                "new_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nSeries with None values: [None, None]\ns_none.ndim: 1\nAnnotation for Series.ndim: <class 'int'>\n"
+            },
+            "label": "intended",
+            "comment": ""
+        },
+        {
+            "test": {
+                "test_code": "# Example 14:\n# Corner case: empty Index - ndim and annotation\nimport pandas as pd\nimport typing\n\nempty_idx = pd.Index([])\nprint(\"Empty Index:\", list(empty_idx))\nprint(\"empty_idx.ndim:\", empty_idx.ndim)\nprint(\"Annotation for Index.ndim:\", typing.get_type_hints(pd.Index.ndim.fget).get(\"return\"))",
+                "old_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nEmpty Index: []\nempty_idx.ndim: 1\nAnnotation for Index.ndim: typing.Literal[1]\n",
+                "new_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nEmpty Index: []\nempty_idx.ndim: 1\nAnnotation for Index.ndim: <class 'int'>\n"
+            },
+            "label": "intended",
+            "comment": ""
+        },
+        {
+            "test": {
+                "test_code": "# Example 15:\n# Corner case: RangeIndex and MultiIndex examples - both are Index subclasses; ndim remains 1\nimport pandas as pd\nimport typing\n\nrange_idx = pd.RangeIndex(start=0, stop=5)\nmulti_idx = pd.MultiIndex.from_product([[1, 2], [\"a\", \"b\"]])\n\nprint(\"RangeIndex:\", list(range_idx)[:6], \"ndim:\", range_idx.ndim)\nprint(\"MultiIndex (first 6 levels):\", list(multi_idx)[:6], \"ndim:\", multi_idx.ndim)\nprint(\"Annotation for Index.ndim (RangeIndex/MultiIndex cases):\", typing.get_type_hints(pd.Index.ndim.fget).get(\"return\"))",
+                "old_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nRangeIndex: [0, 1, 2, 3, 4] ndim: 1\nMultiIndex (first 6 levels): [(1, 'a'), (1, 'b'), (2, 'a'), (2, 'b')] ndim: 1\nAnnotation for Index.ndim (RangeIndex/MultiIndex cases): typing.Literal[1]\n",
+                "new_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nRangeIndex: [0, 1, 2, 3, 4] ndim: 1\nMultiIndex (first 6 levels): [(1, 'a'), (1, 'b'), (2, 'a'), (2, 'b')] ndim: 1\nAnnotation for Index.ndim (RangeIndex/MultiIndex cases): <class 'int'>\n"
+            },
+            "label": "intended",
+            "comment": ""
+        },
+        {
+            "test": {
+                "test_code": "# Example 16:\n# Corner case: Series with dtype=category - ndim unaffected, annotation unchanged\nimport pandas as pd\nimport typing\n\ns_cat = pd.Series(pd.Categorical([\"a\", \"b\", \"a\"]))\nprint(\"Categorical Series:\", s_cat.tolist(), \"dtype:\", s_cat.dtype)\nprint(\"s_cat.ndim:\", s_cat.ndim)\nprint(\"Annotation for Series.ndim:\", typing.get_type_hints(pd.Series.ndim.fget).get(\"return\"))",
+                "old_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nCategorical Series: ['a', 'b', 'a'] dtype: category\ns_cat.ndim: 1\nAnnotation for Series.ndim: typing.Literal[1]\n",
+                "new_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nCategorical Series: ['a', 'b', 'a'] dtype: category\ns_cat.ndim: 1\nAnnotation for Series.ndim: <class 'int'>\n"
+            },
+            "label": "intended",
+            "comment": ""
+        },
+        {
+            "test": {
+                "test_code": "# Example 17:\n# Corner case: Very large Series (deterministic content) - ndim still 1 and annotation is int\nimport pandas as pd\nimport typing\n\n# Create a large Series deterministically (no random)\ns_large = pd.Series(list(range(1000)))\nprint(\"Large Series length:\", len(s_large))\nprint(\"s_large.ndim:\", s_large.ndim)\nprint(\"Annotation for Series.ndim:\", typing.get_type_hints(pd.Series.ndim.fget).get(\"return\"))",
+                "old_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nLarge Series length: 1000\ns_large.ndim: 1\nAnnotation for Series.ndim: typing.Literal[1]\n",
+                "new_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nLarge Series length: 1000\ns_large.ndim: 1\nAnnotation for Series.ndim: <class 'int'>\n"
+            },
+            "label": "intended",
+            "comment": ""
+        },
+        {
+            "test": {
+                "test_code": "# Example 18:\n# Corner case: Subclassing Series and verifying inherited property annotation access\nimport pandas as pd\nimport typing\n\nclass MySeries(pd.Series):\n    # no override of ndim\n    pass\n\nms = MySeries([1, 2, 3])\nprint(\"MySeries instance:\", ms.tolist())\nprint(\"ms.ndim:\", ms.ndim)\n\n# The annotation lives on the inherited fget; introspect via the base class property fget\nannot = typing.get_type_hints(pd.Series.ndim.fget).get(\"return\")\nprint(\"Inherited annotation for ndim:\", annot)",
+                "old_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nMySeries instance: [1, 2, 3]\nms.ndim: 1\nInherited annotation for ndim: typing.Literal[1]\n",
+                "new_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nMySeries instance: [1, 2, 3]\nms.ndim: 1\nInherited annotation for ndim: <class 'int'>\n"
+            },
+            "label": "intended",
+            "comment": ""
+        },
+        {
+            "test": {
+                "test_code": "# Example 19:\n# Corner case: Using the annotation in a runtime check to show it is not Literal[1] anymore\nimport pandas as pd\nimport typing\n\nannot = typing.get_type_hints(pd.Series.ndim.fget).get(\"return\")\norigin = typing.get_origin(annot)\nargs = typing.get_args(annot)\nprint(\"Annotated return type:\", annot)\nprint(\"typing.get_origin:\", origin)\nprint(\"typing.get_args:\", args)\n\nif origin is typing.Literal:\n    print(\"The annotation was Literal with args:\", args)\nelse:\n    print(\"The annotation is not typing.Literal; it's a plain type (expected int)\")",
+                "old_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nAnnotated return type: typing.Literal[1]\ntyping.get_origin: typing.Literal\ntyping.get_args: (1,)\nThe annotation was Literal with args: (1,)\n",
+                "new_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nAnnotated return type: <class 'int'>\ntyping.get_origin: None\ntyping.get_args: ()\nThe annotation is not typing.Literal; it's a plain type (expected int)\n"
+            },
+            "label": "intended",
+            "comment": ""
+        },
+        {
+            "test": {
+                "test_code": "# Example 20:\n# Corner case: Comparing equality of annotation to typing.Literal[1] and to int\nimport pandas as pd\nimport typing\n\nannot = typing.get_type_hints(pd.Series.ndim.fget).get(\"return\")\nprint(\"annotation == int ?\", annot == int)",
+                "old_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nannotation == int ? False\n",
+                "new_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nannotation == int ? True\n"
+            },
+            "label": "intended",
+            "comment": ""
+        }
+    ]
+}

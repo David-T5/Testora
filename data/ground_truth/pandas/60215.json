@@ -1,0 +1,213 @@
+{
+    "pr_number": 60215,
+    "log_file": "60215_2025-10-08 09:36:54.json",
+    "differentiating_tests": [
+        {
+            "test": {
+                "test_code": "# Example 3:\n# DataFrame with a column that has string dtype values containing newline/tab,\n# and a column label that itself contains special characters.\nimport pandas as pd\n\ndf = pd.DataFrame(\n    {\"col\\nlabel\": pd.Series([\"row1\\n\\tX\", \"row2\\r\\nY\"], dtype=\"string\"), \"num\": [1, 2]}\n)\nprint(\"DataFrame dtypes:\")\nprint(df.dtypes)\nprint(\"\\nrepr(DataFrame):\")\nprint(repr(df))",
+                "old_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nDataFrame dtypes:\ncol\\nlabel    string[python]\nnum                    int64\ndtype: object\n\nrepr(DataFrame):\n  col\\nlabel  num\n0    row1\n\tX    1\n1    row2\r\nY    2\n",
+                "new_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nDataFrame dtypes:\ncol\\nlabel    string[python]\nnum                    int64\ndtype: object\n\nrepr(DataFrame):\n  col\\nlabel  num\n0  row1\\n\\tX    1\n1  row2\\r\\nY    2\n"
+            },
+            "label": "intended",
+            "comment": ""
+        },
+        {
+            "test": {
+                "test_code": "# Example 4:\n# Compare representation of object-dtype strings vs pandas' StringDtype.\nimport pandas as pd\n\nvals = [\"hello\\nworld\", \"foo\\tbar\"]\ns_obj = pd.Series(vals, dtype=object)\ns_str = pd.Series(vals, dtype=\"string\")\n\nprint(\"object-dtype Series element reprs ->\", [repr(x) for x in s_obj.tolist()])\nprint(\"string-dtype Series element reprs ->\", [repr(x) for x in s_str.tolist()])\nprint(\"\\nrepr(object Series):\")\nprint(repr(s_obj))\nprint(\"\\nrepr(string Series):\")\nprint(repr(s_str))",
+                "old_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nobject-dtype Series element reprs -> [\"'hello\\\\nworld'\", \"'foo\\\\tbar'\"]\nstring-dtype Series element reprs -> [\"'hello\\\\nworld'\", \"'foo\\\\tbar'\"]\n\nrepr(object Series):\n0    hello\\nworld\n1        foo\\tbar\ndtype: object\n\nrepr(string Series):\n0    hello\nworld\n1        foo\tbar\ndtype: string\n",
+                "new_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nobject-dtype Series element reprs -> [\"'hello\\\\nworld'\", \"'foo\\\\tbar'\"]\nstring-dtype Series element reprs -> [\"'hello\\\\nworld'\", \"'foo\\\\tbar'\"]\n\nrepr(object Series):\n0    hello\\nworld\n1        foo\\tbar\ndtype: object\n\nrepr(string Series):\n0    hello\\nworld\n1        foo\\tbar\ndtype: string\n"
+            },
+            "label": "intended",
+            "comment": ""
+        },
+        {
+            "test": {
+                "test_code": "# Example 7:\n# Mixed missing values (pd.NA) together with strings containing special characters.\nimport pandas as pd\nimport numpy as np\n\nser = pd.Series([\"a\\nb\", pd.NA, None, np.nan], dtype=\"string\", name=\"mixed\\nname\")\nprint(\"Series values (list):\", ser.tolist())\nprint(\"\\nrepr(Series):\")\nprint(repr(ser))",
+                "old_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nSeries values (list): ['a\\nb', <NA>, <NA>, <NA>]\n\nrepr(Series):\n0     a\nb\n1    <NA>\n2    <NA>\n3    <NA>\nName: mixed\\nname, dtype: string\n",
+                "new_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nSeries values (list): ['a\\nb', <NA>, <NA>, <NA>]\n\nrepr(Series):\n0    a\\nb\n1    <NA>\n2    <NA>\n3    <NA>\nName: mixed\\nname, dtype: string\n"
+            },
+            "label": "intended",
+            "comment": ""
+        },
+        {
+            "test": {
+                "test_code": "# Example 8:\n# DataFrame with multiple rows of strings containing newlines and tabs to show table output formatting.\nimport pandas as pd\n\ndf = pd.DataFrame(\n    {\n        \"txt\": pd.Series(\n            [\"line1\\nline2\", \"col\\tsep\", \"a\\r\\nb\", \"\"], dtype=\"string\"\n        ),\n        \"id\": [10, 20, 30, 40],\n    }\n)\nprint(\"DataFrame dtypes:\\n\", df.dtypes)\nprint(\"\\nrepr(DataFrame):\")\nprint(repr(df))",
+                "old_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nDataFrame dtypes:\n txt    string[python]\nid              int64\ndtype: object\n\nrepr(DataFrame):\n           txt  id\n0  line1\nline2  10\n1      col\tsep  20\n2         a\r\nb  30\n3               40\n",
+                "new_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nDataFrame dtypes:\n txt    string[python]\nid              int64\ndtype: object\n\nrepr(DataFrame):\n            txt  id\n0  line1\\nline2  10\n1      col\\tsep  20\n2        a\\r\\nb  30\n3                40\n"
+            },
+            "label": "intended",
+            "comment": ""
+        },
+        {
+            "test": {
+                "test_code": "# Example 11:\n# Corner case: Series with None, np.nan and pd.NA when dtype='string' vs object dtype.\nimport pandas as pd\nimport numpy as np\n\nvals = [None, np.nan, pd.NA, \"a\\nb\"]\ns_str = pd.Series(vals, dtype=\"string\")\ns_obj = pd.Series(vals, dtype=object)\n\nprint(\"string-dtype Series values ->\", s_str.tolist())\nprint(\"object-dtype Series values ->\", s_obj.tolist())\nprint(\"\\nrepr(string Series):\")\nprint(repr(s_str))",
+                "old_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nstring-dtype Series values -> [<NA>, <NA>, <NA>, 'a\\nb']\nobject-dtype Series values -> [None, nan, <NA>, 'a\\nb']\n\nrepr(string Series):\n0    <NA>\n1    <NA>\n2    <NA>\n3     a\nb\ndtype: string\n",
+                "new_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nstring-dtype Series values -> [<NA>, <NA>, <NA>, 'a\\nb']\nobject-dtype Series values -> [None, nan, <NA>, 'a\\nb']\n\nrepr(string Series):\n0    <NA>\n1    <NA>\n2    <NA>\n3    a\\nb\ndtype: string\n"
+            },
+            "label": "intended",
+            "comment": ""
+        },
+        {
+            "test": {
+                "test_code": "# Example 13:\n# Corner case: Very long string containing several special characters to see truncation/ellipsis behavior.\nimport pandas as pd\n\nlong_piece = \"start\\n\" + (\"mid\\t\" * 20) + \"\\r\\nend\"\ns = pd.Series([long_piece], dtype=\"string\")\nprint(\"Length of string ->\", len(s.iloc[0]))\nprint(\"\\nrepr(Series):\")\nprint(repr(s))",
+                "old_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nLength of string -> 91\n\nrepr(Series):\n0    start\nmid\tmid\tmid\tmid\tmid\tmid\tmid\tmid\tmid\tmid\t...\ndtype: string\n",
+                "new_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nLength of string -> 91\n\nrepr(Series):\n0    start\\nmid\\tmid\\tmid\\tmid\\tmid\\tmid\\tmid\\tmid\\...\ndtype: string\n"
+            },
+            "label": "intended",
+            "comment": ""
+        },
+        {
+            "test": {
+                "test_code": "# Example 15:\n# Corner case: Strings that are only special characters (tabs/newlines/carriage returns).\nimport pandas as pd\n\ns = pd.Series([\"\\n\", \"\\t\", \"\\r\", \"\\n\\t\\r\"], dtype=\"string\")\nprint(\"Series values as Python reprs ->\", [repr(x) for x in s.tolist()])\nprint(\"\\nrepr(Series):\")\nprint(repr(s))",
+                "old_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nSeries values as Python reprs -> [\"'\\\\n'\", \"'\\\\t'\", \"'\\\\r'\", \"'\\\\n\\\\t\\\\r'\"]\n\nrepr(Series):\n0      \n\n1      \t\n2      \r\n3    \n\t\r\ndtype: string\n",
+                "new_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nSeries values as Python reprs -> [\"'\\\\n'\", \"'\\\\t'\", \"'\\\\r'\", \"'\\\\n\\\\t\\\\r'\"]\n\nrepr(Series):\n0        \\n\n1        \\t\n2        \\r\n3    \\n\\t\\r\ndtype: string\n"
+            },
+            "label": "intended",
+            "comment": ""
+        },
+        {
+            "test": {
+                "test_code": "# Example 16:\n# Corner case: Multiple empty strings mixed with special-character strings.\nimport pandas as pd\n\ns = pd.Series([\"\", \"\", \"\\n\", \"a\\nb\", \"\"], dtype=\"string\")\nprint(\"List view ->\", s.tolist())\nprint(\"\\nrepr(Series):\")\nprint(repr(s))",
+                "old_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nList view -> ['', '', '\\n', 'a\\nb', '']\n\nrepr(Series):\n0       \n1       \n2      \n\n3    a\nb\n4       \ndtype: string\n",
+                "new_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nList view -> ['', '', '\\n', 'a\\nb', '']\n\nrepr(Series):\n0        \n1        \n2      \\n\n3    a\\nb\n4        \ndtype: string\n"
+            },
+            "label": "intended",
+            "comment": ""
+        },
+        {
+            "test": {
+                "test_code": "# Example 17:\n# Corner case: Casting from object dtype to StringDtype retroactively.\nimport pandas as pd\n\ns_obj = pd.Series([\"x\\nx\", \"y\\tz\"], dtype=object)\nprint(\"Before astype('string') repr:\")\nprint(repr(s_obj))\ns_cast = s_obj.astype(\"string\")\nprint(\"\\nAfter astype('string') repr:\")\nprint(repr(s_cast))",
+                "old_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nBefore astype('string') repr:\n0    x\\nx\n1    y\\tz\ndtype: object\n\nAfter astype('string') repr:\n0    x\nx\n1    y\tz\ndtype: string\n",
+                "new_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nBefore astype('string') repr:\n0    x\\nx\n1    y\\tz\ndtype: object\n\nAfter astype('string') repr:\n0    x\\nx\n1    y\\tz\ndtype: string\n"
+            },
+            "label": "intended",
+            "comment": ""
+        },
+        {
+            "test": {
+                "test_code": "# Example 19:\n# Corner case: Series with mixed-length strings and special characters and checking .to_frame()\nimport pandas as pd\n\ns = pd.Series([\"a\", \"b\\nc\", \"\", \"\\t\"], dtype=\"string\", name=\"nm\\n\")\ndf = s.to_frame()\nprint(\"Original Series repr:\")\nprint(repr(s))",
+                "old_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nOriginal Series repr:\n0      a\n1    b\nc\n2       \n3      \t\nName: nm\\n, dtype: string\n",
+                "new_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nOriginal Series repr:\n0       a\n1    b\\nc\n2        \n3      \\t\nName: nm\\n, dtype: string\n"
+            },
+            "label": "intended",
+            "comment": ""
+        },
+        {
+            "test": {
+                "test_code": "# Example 3:\n# Compare object-dtype Series vs string-dtype Series for a value containing a newline.\nimport pandas as pd\n\ns_obj = pd.Series([\"a\\nb\", \"c\"], dtype=object)\ns_str = pd.Series([\"a\\nb\", \"c\"], dtype=\"string\")\n\nprint(\"object-dtype Series repr:\")\nprint(repr(s_obj))\nprint(\"\\nobject-dtype Series to_string():\")\nprint(s_obj.to_string())\n\nprint(\"\\nstring-dtype Series repr:\")\nprint(repr(s_str))",
+                "old_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nobject-dtype Series repr:\n0    a\\nb\n1       c\ndtype: object\n\nobject-dtype Series to_string():\n0    a\\nb\n1       c\n\nstring-dtype Series repr:\n0    a\nb\n1      c\ndtype: string\n",
+                "new_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nobject-dtype Series repr:\n0    a\\nb\n1       c\ndtype: object\n\nobject-dtype Series to_string():\n0    a\\nb\n1       c\n\nstring-dtype Series repr:\n0    a\\nb\n1       c\ndtype: string\n"
+            },
+            "label": "intended",
+            "comment": ""
+        },
+        {
+            "test": {
+                "test_code": "# Example 4:\n# Strings with tab and carriage return characters in a string-dtype Series\nimport pandas as pd\n\ns = pd.Series([\"first\\tsecond\", \"one\\rtwo\", \"normal\"], dtype=\"string\")\nprint(\"dtype:\", s.dtype)\nprint(\"repr(s):\")\nprint(repr(s))",
+                "old_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\ndtype: string\nrepr(s):\n0    first\tsecond\n1         one\rtwo\n2          normal\ndtype: string\n",
+                "new_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\ndtype: string\nrepr(s):\n0    first\\tsecond\n1         one\\rtwo\n2           normal\ndtype: string\n"
+            },
+            "label": "intended",
+            "comment": ""
+        },
+        {
+            "test": {
+                "test_code": "# Example 5:\n# Strings that include quotes and backslashes and a newline\nimport pandas as pd\n\ns = pd.Series(['He said \"Hi\"\\nNext', r\"Back\\slash\", \"end\"], dtype=\"string\")\nprint(\"Series dtype:\", s.dtype)\nprint(\"repr(s):\")\nprint(repr(s))",
+                "old_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nSeries dtype: string\nrepr(s):\n0    He said \"Hi\"\nNext\n1           Back\\slash\n2                  end\ndtype: string\n",
+                "new_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nSeries dtype: string\nrepr(s):\n0    He said \"Hi\"\\nNext\n1            Back\\slash\n2                   end\ndtype: string\n"
+            },
+            "label": "intended",
+            "comment": ""
+        },
+        {
+            "test": {
+                "test_code": "# Example 7:\n# DataFrame with multiple string columns: show DataFrame rendering (likely without quotes)\nimport pandas as pd\n\ndf = pd.DataFrame({\n    \"A\": pd.Series([\"x\\ny\", \"p\\tq\"], dtype=\"string\"),\n    \"B\": pd.Series(['\"quoted\"', \"plain\"], dtype=\"string\"),\n})\nprint(\"DataFrame to_string():\")\nprint(df.to_string())",
+                "old_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nDataFrame to_string():\n     A         B\n0  x\ny  \"quoted\"\n1  p\tq     plain\n",
+                "new_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nDataFrame to_string():\n      A         B\n0  x\\ny  \"quoted\"\n1  p\\tq     plain\n"
+            },
+            "label": "intended",
+            "comment": ""
+        },
+        {
+            "test": {
+                "test_code": "# Example 8:\n# Using pd.array to create a StringArray and printing it\nimport pandas as pd\n\narr = pd.array([\"line\\nbreak\", \"tab\\there\", pd.NA], dtype=\"string\")\nprint(\"pd.array(..., dtype='string') -> type:\", type(arr))\nprint(\"Array repr:\")\nprint(repr(arr))\nprint(\"\\nConvert to Series and to_string():\")\ns = pd.Series(arr)\nprint(s.to_string())",
+                "old_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\npd.array(..., dtype='string') -> type: <class 'pandas.core.arrays.string_.StringArray'>\nArray repr:\n<StringArray>\n['line\\nbreak', 'tab\\there', <NA>]\nLength: 3, dtype: string\n\nConvert to Series and to_string():\n0    line\nbreak\n1      tab\there\n2          <NA>\n",
+                "new_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\npd.array(..., dtype='string') -> type: <class 'pandas.core.arrays.string_.StringArray'>\nArray repr:\n<StringArray>\n['line\\nbreak', 'tab\\there', <NA>]\nLength: 3, dtype: string\n\nConvert to Series and to_string():\n0    line\\nbreak\n1      tab\\there\n2           <NA>\n"
+            },
+            "label": "intended",
+            "comment": ""
+        },
+        {
+            "test": {
+                "test_code": "# Example 9:\n# Formatting after applying a mapping function; ensure escapes are preserved in the output\nimport pandas as pd\n\ns = pd.Series([\"a\\nb\", \"c\"], dtype=\"string\")\nmapped = s.map(lambda x: (x + \"_suffix\") if pd.notna(x) else x)\nprint(\"Original Series:\")\nprint(s.to_string())",
+                "old_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nOriginal Series:\n0    a\nb\n1      c\n",
+                "new_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nOriginal Series:\n0    a\\nb\n1       c\n"
+            },
+            "label": "intended",
+            "comment": ""
+        },
+        {
+            "test": {
+                "test_code": "# Example 10:\n# Single-column DataFrame vs Series display for the same string value with newline\nimport pandas as pd\n\ns = pd.Series([\"one\\ntwo\"], dtype=\"string\", name=\"only\")\ndf = pd.DataFrame({\"only\": s})\nprint(\"Series to_string():\")\nprint(s.to_string())",
+                "old_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nSeries to_string():\n0    one\ntwo\n",
+                "new_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nSeries to_string():\n0    one\\ntwo\n"
+            },
+            "label": "intended",
+            "comment": ""
+        },
+        {
+            "test": {
+                "test_code": "# Corner Example 4:\n# Strings that are exactly a single newline, tab, or carriage return\nimport pandas as pd\n\ns = pd.Series([\"\\n\", \"\\t\", \"\\r\"], dtype=\"string\")\nprint(\"repr(s):\")\nprint(repr(s))",
+                "old_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nrepr(s):\n0    \n\n1    \t\n2    \r\ndtype: string\n",
+                "new_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nrepr(s):\n0    \\n\n1    \\t\n2    \\r\ndtype: string\n"
+            },
+            "label": "intended",
+            "comment": ""
+        },
+        {
+            "test": {
+                "test_code": "# Corner Example 5:\n# Strings that already contain backslash escape sequences like '\\\\n' vs real newline '\\n'\nimport pandas as pd\n\ns = pd.Series([\"literal\\\\n\", \"actual\\nnewline\"], dtype=\"string\")\nprint(\"repr(s):\")\nprint(repr(s))",
+                "old_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nrepr(s):\n0         literal\\n\n1    actual\nnewline\ndtype: string\n",
+                "new_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nrepr(s):\n0          literal\\n\n1    actual\\nnewline\ndtype: string\n"
+            },
+            "label": "intended",
+            "comment": ""
+        },
+        {
+            "test": {
+                "test_code": "# Corner Example 7:\n# Single-element Series vs single-cell DataFrame: quoting/escaping differences may appear\nimport pandas as pd\n\ns = pd.Series(['contains\\nnewline'], dtype=\"string\")\ndf = pd.DataFrame({\"c\": s})\nprint(\"Single-element Series to_string():\")\nprint(s.to_string())",
+                "old_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nSingle-element Series to_string():\n0    contains\nnewline\n",
+                "new_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nSingle-element Series to_string():\n0    contains\\nnewline\n"
+            },
+            "label": "intended",
+            "comment": ""
+        },
+        {
+            "test": {
+                "test_code": "# Corner Example 8:\n# Mixed types at construction time: integers and complex strings with escapes coerced to string dtype\nimport pandas as pd\n\ns = pd.Series([123, \"line\\nbreak\", r\"back\\slash\", None], dtype=\"string\")\nprint(\"Original input:\", [123, \"line\\nbreak\", r\"back\\slash\", None])\nprint(\"Series dtype:\", s.dtype)\nprint(\"repr(s):\")\nprint(repr(s))",
+                "old_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nOriginal input: [123, 'line\\nbreak', 'back\\\\slash', None]\nSeries dtype: string\nrepr(s):\n0           123\n1    line\nbreak\n2    back\\slash\n3          <NA>\ndtype: string\n",
+                "new_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nOriginal input: [123, 'line\\nbreak', 'back\\\\slash', None]\nSeries dtype: string\nrepr(s):\n0            123\n1    line\\nbreak\n2     back\\slash\n3           <NA>\ndtype: string\n"
+            },
+            "label": "intended",
+            "comment": ""
+        },
+        {
+            "test": {
+                "test_code": "# Corner Example 9:\n# Using Series.where to introduce pd.NA and checking formatting of the result\nimport pandas as pd\nimport numpy as np\n\ns = pd.Series([\"keep\\nme\", \"keep\\tme\", \"drop\"], dtype=\"string\")\nmask = s.str.contains(\"drop\")\nres = s.where(~mask)  # 'drop' becomes <NA>\nprint(\"Mask (drop rows True):\", mask.tolist())\nprint(\"\\nResult Series repr:\")\nprint(repr(res))",
+                "old_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nMask (drop rows True): [False, False, True]\n\nResult Series repr:\n0    keep\nme\n1    keep\tme\n2       <NA>\ndtype: string\n",
+                "new_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nMask (drop rows True): [False, False, True]\n\nResult Series repr:\n0    keep\\nme\n1    keep\\tme\n2        <NA>\ndtype: string\n"
+            },
+            "label": "intended",
+            "comment": ""
+        },
+        {
+            "test": {
+                "test_code": "# Corner Example 10:\n# Convert object-dtype Series with newlines to string-dtype explicitly and compare printing behavior\nimport pandas as pd\n\ns_obj = pd.Series([\"A\\nB\", \"C\\nD\"], dtype=object)\ns_str = s_obj.astype(\"string\")\nprint(\"object-dtype Series to_string():\")\nprint(s_obj.to_string())\nprint(\"\\nConverted to string-dtype Series to_string():\")\nprint(s_str.to_string())",
+                "old_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nobject-dtype Series to_string():\n0    A\\nB\n1    C\\nD\n\nConverted to string-dtype Series to_string():\n0    A\nB\n1    C\nD\n",
+                "new_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nobject-dtype Series to_string():\n0    A\\nB\n1    C\\nD\n\nConverted to string-dtype Series to_string():\n0    A\\nB\n1    C\\nD\n"
+            },
+            "label": "intended",
+            "comment": ""
+        }
+    ]
+}

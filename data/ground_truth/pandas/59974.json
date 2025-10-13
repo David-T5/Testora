@@ -1,0 +1,114 @@
+{
+    "pr_number": 59974,
+    "log_file": "59974_2025-09-24 14:57:23.json",
+    "differentiating_tests": [
+        {
+            "test": {
+                "test_code": "# Example 3:\nimport pandas as pd\n\n# Convert a Timedelta to numeric\ntimedelta = pd.Timedelta(days=1)\nresult = pd.to_numeric(timedelta)",
+                "old_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nTraceback (most recent call last):\n  File \"pandas/_libs/lib.pyx\", line 2407, in pandas._libs.lib.maybe_convert_numeric\n    floatify(val, &fval, &maybe_int)\nTypeError: Invalid object type\n\nDuring handling of the above exception, another exception occurred:\n\nTraceback (most recent call last):\n  File \"/tmp/Testora/Testora_test_code.py\", line 6, in <module>\n    result = pd.to_numeric(timedelta)\n             ^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/pandas/pandas/core/tools/numeric.py\", line 218, in to_numeric\n    values, new_mask = lib.maybe_convert_numeric(  # type: ignore[call-overload]\n                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"pandas/_libs/lib.pyx\", line 2449, in pandas._libs.lib.maybe_convert_numeric\n    raise type(err)(f\"{err} at position {i}\")\nTypeError: Invalid object type at position 0\n",
+                "new_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\n"
+            },
+            "label": "intended",
+            "comment": "Timestamp and Timedelta can now transformed into numeric values."
+        },
+        {
+            "test": {
+                "test_code": "# Example 4:\nimport pandas as pd\n\n# Convert a Timestamp to numeric\ntimestamp = pd.Timestamp(\"2020-01-01\")\nresult = pd.to_numeric(timestamp)",
+                "old_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nTraceback (most recent call last):\n  File \"pandas/_libs/lib.pyx\", line 2407, in pandas._libs.lib.maybe_convert_numeric\n    floatify(val, &fval, &maybe_int)\nTypeError: Invalid object type\n\nDuring handling of the above exception, another exception occurred:\n\nTraceback (most recent call last):\n  File \"/tmp/Testora/Testora_test_code.py\", line 6, in <module>\n    result = pd.to_numeric(timestamp)\n             ^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/pandas/pandas/core/tools/numeric.py\", line 218, in to_numeric\n    values, new_mask = lib.maybe_convert_numeric(  # type: ignore[call-overload]\n                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"pandas/_libs/lib.pyx\", line 2449, in pandas._libs.lib.maybe_convert_numeric\n    raise type(err)(f\"{err} at position {i}\")\nTypeError: Invalid object type at position 0\n",
+                "new_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\n"
+            },
+            "label": "intended",
+            "comment": "Timestamp and Timedelta can now transformed into numeric values."
+        },
+        {
+            "test": {
+                "test_code": "# Example 20:\nimport pandas as pd\n\n# Test conversion of a Timestamp with timezone info to numeric\ntimestamp_tz = pd.Timestamp(\"2020-01-01T12:00:00\", tz=\"UTC\")\nresult = pd.to_numeric(timestamp_tz)",
+                "old_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nTraceback (most recent call last):\n  File \"pandas/_libs/lib.pyx\", line 2407, in pandas._libs.lib.maybe_convert_numeric\n    floatify(val, &fval, &maybe_int)\nTypeError: Invalid object type\n\nDuring handling of the above exception, another exception occurred:\n\nTraceback (most recent call last):\n  File \"/tmp/Testora/Testora_test_code.py\", line 6, in <module>\n    result = pd.to_numeric(timestamp_tz)\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/pandas/pandas/core/tools/numeric.py\", line 218, in to_numeric\n    values, new_mask = lib.maybe_convert_numeric(  # type: ignore[call-overload]\n                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"pandas/_libs/lib.pyx\", line 2449, in pandas._libs.lib.maybe_convert_numeric\n    raise type(err)(f\"{err} at position {i}\")\nTypeError: Invalid object type at position 0\n",
+                "new_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\n"
+            },
+            "label": "intended",
+            "comment": "Timestamp and Timedelta can now transformed into numeric values."
+        },
+        {
+            "test": {
+                "test_code": "# Example 7:\nimport pandas as pd\n\n# Converting a Timestamp to numeric\ntimestamp = pd.Timestamp('2023-01-01 00:00:00')\nresult = pd.to_numeric(timestamp)",
+                "old_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nTraceback (most recent call last):\n  File \"pandas/_libs/lib.pyx\", line 2407, in pandas._libs.lib.maybe_convert_numeric\n    floatify(val, &fval, &maybe_int)\nTypeError: Invalid object type\n\nDuring handling of the above exception, another exception occurred:\n\nTraceback (most recent call last):\n  File \"/tmp/Testora/Testora_test_code.py\", line 6, in <module>\n    result = pd.to_numeric(timestamp)\n             ^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/pandas/pandas/core/tools/numeric.py\", line 218, in to_numeric\n    values, new_mask = lib.maybe_convert_numeric(  # type: ignore[call-overload]\n                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"pandas/_libs/lib.pyx\", line 2449, in pandas._libs.lib.maybe_convert_numeric\n    raise type(err)(f\"{err} at position {i}\")\nTypeError: Invalid object type at position 0\n",
+                "new_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\n"
+            },
+            "label": "intended",
+            "comment": "Timestamp and Timedelta can now transformed into numeric values."
+        },
+        {
+            "test": {
+                "test_code": "# Example 8:\nimport pandas as pd\n\n# Converting a Timedelta to numeric\ntimedelta = pd.Timedelta(days=1)\nresult = pd.to_numeric(timedelta)",
+                "old_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nTraceback (most recent call last):\n  File \"pandas/_libs/lib.pyx\", line 2407, in pandas._libs.lib.maybe_convert_numeric\n    floatify(val, &fval, &maybe_int)\nTypeError: Invalid object type\n\nDuring handling of the above exception, another exception occurred:\n\nTraceback (most recent call last):\n  File \"/tmp/Testora/Testora_test_code.py\", line 6, in <module>\n    result = pd.to_numeric(timedelta)\n             ^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/pandas/pandas/core/tools/numeric.py\", line 218, in to_numeric\n    values, new_mask = lib.maybe_convert_numeric(  # type: ignore[call-overload]\n                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"pandas/_libs/lib.pyx\", line 2449, in pandas._libs.lib.maybe_convert_numeric\n    raise type(err)(f\"{err} at position {i}\")\nTypeError: Invalid object type at position 0\n",
+                "new_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\n"
+            },
+            "label": "intended",
+            "comment": "Timestamp and Timedelta can now transformed into numeric values."
+        },
+        {
+            "test": {
+                "test_code": "# Example 6:\n# New/changed behavior: scalar pd.Timedelta is accepted by to_numeric and returns nanoseconds.\nimport pandas as pd\n\ntd = pd.Timedelta(1, \"D\")  # 1 day\nprint(\"Timedelta scalar:\", td)\nprint(\"Timedelta.value (ns):\", td.value)\n\nresult_scalar = pd.to_numeric(td)",
+                "old_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nTimedelta scalar: 1 days 00:00:00\nTimedelta.value (ns): 86400000000000\nTraceback (most recent call last):\n  File \"pandas/_libs/lib.pyx\", line 2407, in pandas._libs.lib.maybe_convert_numeric\n    floatify(val, &fval, &maybe_int)\nTypeError: Invalid object type\n\nDuring handling of the above exception, another exception occurred:\n\nTraceback (most recent call last):\n  File \"/tmp/Testora/Testora_test_code.py\", line 9, in <module>\n    result_scalar = pd.to_numeric(td)\n                    ^^^^^^^^^^^^^^^^^\n  File \"/home/pandas/pandas/core/tools/numeric.py\", line 218, in to_numeric\n    values, new_mask = lib.maybe_convert_numeric(  # type: ignore[call-overload]\n                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"pandas/_libs/lib.pyx\", line 2449, in pandas._libs.lib.maybe_convert_numeric\n    raise type(err)(f\"{err} at position {i}\")\nTypeError: Invalid object type at position 0\n",
+                "new_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nTimedelta scalar: 1 days 00:00:00\nTimedelta.value (ns): 86400000000000\n"
+            },
+            "label": "intended",
+            "comment": ""
+        },
+        {
+            "test": {
+                "test_code": "# Example 71:\n# New/changed behavior: scalar naive pd.Timestamp is accepted by to_numeric and returns ns since epoch.\nimport pandas as pd\n\nts = pd.Timestamp(\"2017-01-01T12\")\nprint(\"Timestamp scalar:\", ts)\nprint(\"Timestamp.value (ns):\", ts.value)\n\nresult_ts = pd.to_numeric(ts)",
+                "old_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nTimestamp scalar: 2017-01-01 12:00:00\nTimestamp.value (ns): 1483272000000000000\nTraceback (most recent call last):\n  File \"pandas/_libs/lib.pyx\", line 2407, in pandas._libs.lib.maybe_convert_numeric\n    floatify(val, &fval, &maybe_int)\nTypeError: Invalid object type\n\nDuring handling of the above exception, another exception occurred:\n\nTraceback (most recent call last):\n  File \"/tmp/Testora/Testora_test_code.py\", line 9, in <module>\n    result_ts = pd.to_numeric(ts)\n                ^^^^^^^^^^^^^^^^^\n  File \"/home/pandas/pandas/core/tools/numeric.py\", line 218, in to_numeric\n    values, new_mask = lib.maybe_convert_numeric(  # type: ignore[call-overload]\n                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"pandas/_libs/lib.pyx\", line 2449, in pandas._libs.lib.maybe_convert_numeric\n    raise type(err)(f\"{err} at position {i}\")\nTypeError: Invalid object type at position 0\n",
+                "new_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nTimestamp scalar: 2017-01-01 12:00:00\nTimestamp.value (ns): 1483272000000000000\n"
+            },
+            "label": "intended",
+            "comment": ""
+        },
+        {
+            "test": {
+                "test_code": "# Example 81:\n# New/changed behavior: scalar timezone-aware pd.Timestamp is accepted by to_numeric.\nimport pandas as pd\n\nts_tz = pd.Timestamp(\"2017-01-01T12\", tz=\"US/Pacific\")\nprint(\"Timezone-aware Timestamp:\", ts_tz)\nprint(\"Timestamp.value (ns, absolute UTC reference):\", ts_tz.value)\n\nresult_ts_tz = pd.to_numeric(ts_tz)",
+                "old_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nTimezone-aware Timestamp: 2017-01-01 12:00:00-08:00\nTimestamp.value (ns, absolute UTC reference): 1483300800000000000\nTraceback (most recent call last):\n  File \"pandas/_libs/lib.pyx\", line 2407, in pandas._libs.lib.maybe_convert_numeric\n    floatify(val, &fval, &maybe_int)\nTypeError: Invalid object type\n\nDuring handling of the above exception, another exception occurred:\n\nTraceback (most recent call last):\n  File \"/tmp/Testora/Testora_test_code.py\", line 9, in <module>\n    result_ts_tz = pd.to_numeric(ts_tz)\n                   ^^^^^^^^^^^^^^^^^^^^\n  File \"/home/pandas/pandas/core/tools/numeric.py\", line 218, in to_numeric\n    values, new_mask = lib.maybe_convert_numeric(  # type: ignore[call-overload]\n                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"pandas/_libs/lib.pyx\", line 2449, in pandas._libs.lib.maybe_convert_numeric\n    raise type(err)(f\"{err} at position {i}\")\nTypeError: Invalid object type at position 0\n",
+                "new_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nTimezone-aware Timestamp: 2017-01-01 12:00:00-08:00\nTimestamp.value (ns, absolute UTC reference): 1483300800000000000\n"
+            },
+            "label": "intended",
+            "comment": ""
+        },
+        {
+            "test": {
+                "test_code": "# Example 1:\n# Scalar pd.Timestamp -> to_numeric returns integer nanoseconds since epoch\nimport pandas as pd\nts = pd.Timestamp(\"2020-01-01 00:00:00\")\nprint(\"Input Timestamp:\", ts)\nprint(\"Timestamp.value (ns since epoch):\", ts.value)\nout = pd.to_numeric(ts)",
+                "old_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nInput Timestamp: 2020-01-01 00:00:00\nTimestamp.value (ns since epoch): 1577836800000000000\nTraceback (most recent call last):\n  File \"pandas/_libs/lib.pyx\", line 2407, in pandas._libs.lib.maybe_convert_numeric\n    floatify(val, &fval, &maybe_int)\nTypeError: Invalid object type\n\nDuring handling of the above exception, another exception occurred:\n\nTraceback (most recent call last):\n  File \"/tmp/Testora/Testora_test_code.py\", line 7, in <module>\n    out = pd.to_numeric(ts)\n          ^^^^^^^^^^^^^^^^^\n  File \"/home/pandas/pandas/core/tools/numeric.py\", line 218, in to_numeric\n    values, new_mask = lib.maybe_convert_numeric(  # type: ignore[call-overload]\n                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"pandas/_libs/lib.pyx\", line 2449, in pandas._libs.lib.maybe_convert_numeric\n    raise type(err)(f\"{err} at position {i}\")\nTypeError: Invalid object type at position 0\n",
+                "new_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nInput Timestamp: 2020-01-01 00:00:00\nTimestamp.value (ns since epoch): 1577836800000000000\n"
+            },
+            "label": "intended",
+            "comment": ""
+        },
+        {
+            "test": {
+                "test_code": "# Example 2:\n# Scalar pd.Timedelta -> to_numeric returns integer nanoseconds (duration)\nimport pandas as pd\ntd = pd.Timedelta(\"2 days 03:04:05\")\nprint(\"Input Timedelta:\", td)\nprint(\"Timedelta.value (ns):\", td.value)\nout = pd.to_numeric(td)",
+                "old_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nInput Timedelta: 2 days 03:04:05\nTimedelta.value (ns): 183845000000000\nTraceback (most recent call last):\n  File \"pandas/_libs/lib.pyx\", line 2407, in pandas._libs.lib.maybe_convert_numeric\n    floatify(val, &fval, &maybe_int)\nTypeError: Invalid object type\n\nDuring handling of the above exception, another exception occurred:\n\nTraceback (most recent call last):\n  File \"/tmp/Testora/Testora_test_code.py\", line 7, in <module>\n    out = pd.to_numeric(td)\n          ^^^^^^^^^^^^^^^^^\n  File \"/home/pandas/pandas/core/tools/numeric.py\", line 218, in to_numeric\n    values, new_mask = lib.maybe_convert_numeric(  # type: ignore[call-overload]\n                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"pandas/_libs/lib.pyx\", line 2449, in pandas._libs.lib.maybe_convert_numeric\n    raise type(err)(f\"{err} at position {i}\")\nTypeError: Invalid object type at position 0\n",
+                "new_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nInput Timedelta: 2 days 03:04:05\nTimedelta.value (ns): 183845000000000\n"
+            },
+            "label": "intended",
+            "comment": ""
+        },
+        {
+            "test": {
+                "test_code": "# Example 72:\n# Timezone-aware Timestamp -> numeric representation uses the absolute ns value\nimport pandas as pd\nts_tz = pd.Timestamp(\"2020-01-01 00:00:00\", tz=\"UTC\")\nprint(\"Timezone-aware Timestamp:\", ts_tz)\nprint(\"Timestamp.value (ns since epoch):\", ts_tz.value)\nprint(\"pd.to_numeric ->\", pd.to_numeric(ts_tz))",
+                "old_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nTimezone-aware Timestamp: 2020-01-01 00:00:00+00:00\nTimestamp.value (ns since epoch): 1577836800000000000\nTraceback (most recent call last):\n  File \"pandas/_libs/lib.pyx\", line 2407, in pandas._libs.lib.maybe_convert_numeric\n    floatify(val, &fval, &maybe_int)\nTypeError: Invalid object type\n\nDuring handling of the above exception, another exception occurred:\n\nTraceback (most recent call last):\n  File \"/tmp/Testora/Testora_test_code.py\", line 7, in <module>\n    print(\"pd.to_numeric ->\", pd.to_numeric(ts_tz))\n                              ^^^^^^^^^^^^^^^^^^^^\n  File \"/home/pandas/pandas/core/tools/numeric.py\", line 218, in to_numeric\n    values, new_mask = lib.maybe_convert_numeric(  # type: ignore[call-overload]\n                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"pandas/_libs/lib.pyx\", line 2449, in pandas._libs.lib.maybe_convert_numeric\n    raise type(err)(f\"{err} at position {i}\")\nTypeError: Invalid object type at position 0\n",
+                "new_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nTimezone-aware Timestamp: 2020-01-01 00:00:00+00:00\nTimestamp.value (ns since epoch): 1577836800000000000\npd.to_numeric -> 1577836800\n"
+            },
+            "label": "intended",
+            "comment": ""
+        },
+        {
+            "test": {
+                "test_code": "# Example 18:\n# Corner case: very large Timedelta (months approximated as days) -> numeric still returns ns integer\nimport pandas as pd\ntd = pd.Timedelta(days=10_000)  # deterministic large duration\nprint(\"Input large Timedelta:\", td)\nprint(\"Timedelta.value (ns):\", td.value)\nout = pd.to_numeric(td)",
+                "old_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nInput large Timedelta: 10000 days 00:00:00\nTimedelta.value (ns): 864000000000000000\nTraceback (most recent call last):\n  File \"pandas/_libs/lib.pyx\", line 2407, in pandas._libs.lib.maybe_convert_numeric\n    floatify(val, &fval, &maybe_int)\nTypeError: Invalid object type\n\nDuring handling of the above exception, another exception occurred:\n\nTraceback (most recent call last):\n  File \"/tmp/Testora/Testora_test_code.py\", line 7, in <module>\n    out = pd.to_numeric(td)\n          ^^^^^^^^^^^^^^^^^\n  File \"/home/pandas/pandas/core/tools/numeric.py\", line 218, in to_numeric\n    values, new_mask = lib.maybe_convert_numeric(  # type: ignore[call-overload]\n                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"pandas/_libs/lib.pyx\", line 2449, in pandas._libs.lib.maybe_convert_numeric\n    raise type(err)(f\"{err} at position {i}\")\nTypeError: Invalid object type at position 0\n",
+                "new_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nInput large Timedelta: 10000 days 00:00:00\nTimedelta.value (ns): 864000000000000000\n"
+            },
+            "label": "intended",
+            "comment": ""
+        }
+    ]
+}

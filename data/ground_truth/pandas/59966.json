@@ -1,0 +1,69 @@
+{
+    "pr_number": 59966,
+    "log_file": "59966_2025-09-24 14:57:23.json",
+    "differentiating_tests": [
+        {
+            "test": {
+                "test_code": "import pandas as pd\n# Example 2: Comparison in categorical series\ndf = pd.DataFrame({'species': pd.Series([\"cat\", \"dog\", None], dtype=\"category\")})\nresult = df['species'].apply(lambda x: x == \"dog\")\nprint(result)  # Expected: [False, True, NaN]",
+                "old_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\n0    False\n1     True\n2      NaN\nName: species, dtype: category\nCategories (2, bool): [False, True]\n",
+                "new_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\n0    False\n1     True\n2    False\nName: species, dtype: bool\n"
+            },
+            "label": "intended",
+            "comment": "Row with NaN is treated"
+        },
+        {
+            "test": {
+                "test_code": "import pandas as pd\n# Example 4: Using apply with conditions\ndf = pd.DataFrame({'value': pd.Series([10, 20, None], dtype=\"category\")})\nresult = df['value'].apply(lambda x: \"High\" if x > 15 else \"Low\")\nprint(result)  # Expected: ['Low', 'High', NaN]",
+                "old_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\n0     Low\n1    High\n2     NaN\nName: value, dtype: category\nCategories (2, object): ['Low', 'High']\n",
+                "new_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\n0     Low\n1    High\n2     Low\nName: value, dtype: object\n"
+            },
+            "label": "intended",
+            "comment": "Unsure. How do we treat NaN? Is NaN greater or lower than 15?"
+        },
+        {
+            "test": {
+                "test_code": "import pandas as pd\n# Example 9: Complex handler with if-else logic\ncategorical_series = pd.Series([\"yes\", \"no\", None], dtype=\"category\")\nresult = categorical_series.apply(lambda x: \"Confirmed\" if x == \"yes\" else \"Denied\")\nprint(result)  # Expected: ['Confirmed', 'Denied', NaN]",
+                "old_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\n0    Confirmed\n1       Denied\n2          NaN\ndtype: category\nCategories (2, object): ['Denied', 'Confirmed']\n",
+                "new_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\n0    Confirmed\n1       Denied\n2       Denied\ndtype: object\n"
+            },
+            "label": "intended",
+            "comment": "Row with NaN is treated"
+        },
+        {
+            "test": {
+                "test_code": "import pandas as pd\n# Example 10: Custom function for transformations\ndef transform_func(x):\n    if pd.isna(x):\n        return None\n    return x[::-1]\n\ncategorical_series = pd.Series([\"abc\", \"def\", None], dtype=\"category\")\nresult = categorical_series.apply(transform_func)\nprint(result)  # Expected: ['cba', 'fed', NaN]",
+                "old_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\n0    cba\n1    fed\n2    NaN\ndtype: category\nCategories (2, object): ['cba', 'fed']\n",
+                "new_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\n0     cba\n1     fed\n2    None\ndtype: object\n"
+            },
+            "label": "intended",
+            "comment": "Row with NaN is treated"
+        },
+        {
+            "test": {
+                "test_code": "import pandas as pd\n# Example 1: Only one category with NaN\ncategorical_series = pd.Series([None], dtype=\"category\")\nresult = categorical_series.apply(lambda x: \"Present\" if x is not None else \"Absent\")\nprint(result)  # Expected: ['Absent']",
+                "old_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\n0   NaN\ndtype: category\nCategories (0, float64): []\n",
+                "new_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\n0    Present\ndtype: object\n"
+            },
+            "label": "intended",
+            "comment": "Row with NaN is treated"
+        },
+        {
+            "test": {
+                "test_code": "import pandas as pd\n# Example 21: Series with only NaN values\ncategorical_series = pd.Series([None, None], dtype=\"category\")\nresult = categorical_series.apply(lambda x: \"Exists\" if x is not None else \"Does not exist\")\nprint(result)  # Expected: ['Does not exist', 'Does not exist']",
+                "old_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\n0   NaN\n1   NaN\ndtype: category\nCategories (0, float64): []\n",
+                "new_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\n0    Exists\n1    Exists\ndtype: object\n"
+            },
+            "label": "intended",
+            "comment": "Row with NaN is treated"
+        },
+        {
+            "test": {
+                "test_code": "import pandas as pd\n# Example 6: Categorical with None-type values\ncategorical_series = pd.Series([\"A\", \"B\", None], dtype=\"category\")\nresult = categorical_series.apply(lambda x: \"X\" if x is None else \"Not X\")\nprint(result)  # Expected: ['Not X', 'Not X', 'X']",
+                "old_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\n0    Not X\n1    Not X\n2      NaN\ndtype: object\n",
+                "new_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\n0    Not X\n1    Not X\n2    Not X\ndtype: object\n"
+            },
+            "label": "intended",
+            "comment": "Row with NaN is treated"
+        }
+    ]
+}

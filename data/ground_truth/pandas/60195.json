@@ -1,0 +1,87 @@
+{
+    "pr_number": 60195,
+    "log_file": "60195_2025-10-07 13:00:31.json",
+    "differentiating_tests": [
+        {
+            "test": {
+                "test_code": "# Example 3:\n# Series.where with replacement None. For string dtype this becomes <NA>.\nimport pandas as pd\ns = pd.Series([\"x\", \"y\", \"z\"], dtype=\"string\")\nmask = pd.Series([True, False, True])\nprint(\"Original:\")\nprint(s)\nprint(\"\\nMask:\")\nprint(mask)\n\nres = s.where(mask, None)\nprint(\"\\nResult of s.where(mask, None):\")\nprint(res)",
+                "old_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nOriginal:\n0    x\n1    y\n2    z\ndtype: string\n\nMask:\n0     True\n1    False\n2     True\ndtype: bool\n\nResult of s.where(mask, None):\n0       x\n1    None\n2       z\ndtype: string\n",
+                "new_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nOriginal:\n0    x\n1    y\n2    z\ndtype: string\n\nMask:\n0     True\n1    False\n2     True\ndtype: bool\n\nResult of s.where(mask, None):\n0       x\n1    <NA>\n2       z\ndtype: string\n"
+            },
+            "label": "intended",
+            "comment": ""
+        },
+        {
+            "test": {
+                "test_code": "# Example 10:\n# Compare object dtype vs string dtype when attempting to replace with a non-string scalar.\nimport pandas as pd\ns_obj = pd.Series([\"one\", \"two\", None], dtype=object)\ns_str = pd.Series([\"one\", \"two\", None], dtype=\"string\")\n\nprint(\"Original object-dtype Series:\")\nprint(s_obj)\nprint(\"\\nOriginal string-dtype Series:\")\nprint(s_str)\n\nrep = 123  # non-string replacement\n\nres_obj = s_obj.where(s_obj.notna(), rep)\nprint(\"\\nObject-dtype result of where(..., 123):\")\nprint(res_obj)\nprint(\"Object result dtypes/values:\", [type(x) for x in res_obj.tolist()])\n\ntry:\n    res_str = s_str.where(s_str.notna(), rep)\n    print(\"\\nString-dtype result of where(..., 123):\")\n    print(res_str)\nexcept Exception as e:\n    print(\"\\nString-dtype where(..., 123) raised an exception:\")",
+                "old_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nOriginal object-dtype Series:\n0     one\n1     two\n2    None\ndtype: object\n\nOriginal string-dtype Series:\n0     one\n1     two\n2    <NA>\ndtype: string\n\nObject-dtype result of where(..., 123):\n0    one\n1    two\n2    123\ndtype: object\nObject result dtypes/values: [<class 'str'>, <class 'str'>, <class 'int'>]\n\nString-dtype result of where(..., 123):\n0    one\n1    two\n2    123\ndtype: string\n",
+                "new_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nOriginal object-dtype Series:\n0     one\n1     two\n2    None\ndtype: object\n\nOriginal string-dtype Series:\n0     one\n1     two\n2    <NA>\ndtype: string\n\nObject-dtype result of where(..., 123):\n0    one\n1    two\n2    123\ndtype: object\nObject result dtypes/values: [<class 'str'>, <class 'str'>, <class 'int'>]\n\nString-dtype where(..., 123) raised an exception:\n"
+            },
+            "label": "coincidental fix",
+            "comment": "Unsure, cannot add int value to a string array. New version throws an error while old terminates."
+        },
+        {
+            "test": {
+                "test_code": "# Example 11:\n# Corner: Replace with None on string dtype; results should show <NA> entries preserved as string extension NA.\nimport pandas as pd\ns = pd.Series([\"a\", \"b\", \"c\"], dtype=\"string\")\nmask = pd.Series([False, True, False])\nprint(\"Original:\")\nprint(s)\n\nres = s.where(mask, None)\nprint(\"\\nResult of s.where(mask, None):\")\nprint(res)",
+                "old_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nOriginal:\n0    a\n1    b\n2    c\ndtype: string\n\nResult of s.where(mask, None):\n0    None\n1       b\n2    None\ndtype: string\n",
+                "new_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nOriginal:\n0    a\n1    b\n2    c\ndtype: string\n\nResult of s.where(mask, None):\n0    <NA>\n1       b\n2    <NA>\ndtype: string\n"
+            },
+            "label": "intended",
+            "comment": ""
+        },
+        {
+            "test": {
+                "test_code": "# Example 13:\n# Corner: Replace with numpy.nan into a string dtype Series (np.nan should be coerced to <NA>).\nimport pandas as pd\nimport numpy as np\ns = pd.Series([\"x\", None, \"z\"], dtype=\"string\")\nmask = pd.Series([True, False, True])\nprint(\"Original:\")\nprint(s)\n\nres = s.where(mask, np.nan)\nprint(\"\\nResult of s.where(mask, np.nan):\")\nprint(res)",
+                "old_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nOriginal:\n0       x\n1    <NA>\n2       z\ndtype: string\n\nResult of s.where(mask, np.nan):\n0      x\n1    NaN\n2      z\ndtype: string\n",
+                "new_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nOriginal:\n0       x\n1    <NA>\n2       z\ndtype: string\n\nResult of s.where(mask, np.nan):\n0       x\n1    <NA>\n2       z\ndtype: string\n"
+            },
+            "label": "intended",
+            "comment": ""
+        },
+        {
+            "test": {
+                "test_code": "# Example 14:\n# Corner: Attempt to replace into a string Series with an integer scalar => expect TypeError (cannot set non-string)\nimport pandas as pd\ns = pd.Series([\"aa\", None, \"bb\"], dtype=\"string\")\nmask = pd.Series([True, False, True])\nprint(\"Original:\")\nprint(s)\n\ntry:\n    out = s.where(mask, 10)  # non-string replacement\n    print(\"\\nResult (unexpected success):\")\n    print(out)\nexcept Exception as e:\n    print(\"\\nExpected exception when replacing with integer into string-dtype Series:\")",
+                "old_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nOriginal:\n0      aa\n1    <NA>\n2      bb\ndtype: string\n\nResult (unexpected success):\n0    aa\n1    10\n2    bb\ndtype: string\n",
+                "new_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nOriginal:\n0      aa\n1    <NA>\n2      bb\ndtype: string\n\nExpected exception when replacing with integer into string-dtype Series:\n"
+            },
+            "label": "coincidental fix",
+            "comment": "New version throws an error when try to replace an element from the string array with an integer. Old version terminates"
+        },
+        {
+            "test": {
+                "test_code": "# Example 15:\n# Corner: Attempt to replace into a string Series with a boolean scalar => expect TypeError\nimport pandas as pd\ns = pd.Series([\"t\", \"f\", None], dtype=\"string\")\nmask = pd.Series([True, False, True])\nprint(\"Original:\")\nprint(s)\n\ntry:\n    out = s.where(mask, True)\n    print(\"\\nResult (unexpected success):\")\n    print(out)\nexcept Exception as e:\n    print(\"\\nExpected exception when replacing with boolean into string-dtype Series:\")",
+                "old_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nOriginal:\n0       t\n1       f\n2    <NA>\ndtype: string\n\nResult (unexpected success):\n0       t\n1    True\n2    <NA>\ndtype: string\n",
+                "new_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nOriginal:\n0       t\n1       f\n2    <NA>\ndtype: string\n\nExpected exception when replacing with boolean into string-dtype Series:\n"
+            },
+            "label": "coincidental fix",
+            "comment": "New version raises error, when replace element of string array with a value of another type. Old version terminates."
+        },
+        {
+            "test": {
+                "test_code": "# Example 16:\n# Corner: Elementwise 'other' array with mixed types (some non-strings) for a string Series.\n# This will raise if any non-string that is not NA is present in 'other'.\nimport pandas as pd\ns = pd.Series([\"p\", \"q\", \"r\"], dtype=\"string\")\nmask = pd.Series([True, False, True])\nother = pd.Series([\"ok\", None, 7])  # last element is an int -> not acceptable into string dtype\n\nprint(\"Original:\")\nprint(s)\nprint(\"\\nOther (elementwise):\")\nprint(other)\n\ntry:\n    out = s.where(mask, other)\n    print(\"\\nResult (unexpected success):\")\n    print(out)\nexcept Exception as e:\n    print(\"\\nExpected exception when providing mixed-type 'other' to string-dtype Series:\")",
+                "old_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nOriginal:\n0    p\n1    q\n2    r\ndtype: string\n\nOther (elementwise):\n0      ok\n1    None\n2       7\ndtype: object\n\nResult (unexpected success):\n0       p\n1    None\n2       r\ndtype: string\n",
+                "new_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nOriginal:\n0    p\n1    q\n2    r\ndtype: string\n\nOther (elementwise):\n0      ok\n1    None\n2       7\ndtype: object\n\nResult (unexpected success):\n0       p\n1    <NA>\n2       r\ndtype: string\n"
+            },
+            "label": "intended",
+            "comment": ""
+        },
+        {
+            "test": {
+                "test_code": "# Example 19:\n# Corner: DataFrame where a non-string scalar is used but only one column is string-dtype;\n# the operation will raise because the string dtype column cannot accept the non-string scalar.\nimport pandas as pd\nimport numpy as np\n\ndf = pd.DataFrame({\n    \"s\": pd.Series([\"a\", None], dtype=\"string\"),\n    \"o\": [1.0, np.nan]\n})\nprint(\"Original DataFrame:\")\nprint(df)\n\ntry:\n    # Attempt to replace nulls in the whole DataFrame with integer 0\n    res = df.where(df.notna(), other=0)\n    print(\"\\nResult (unexpected success):\")\n    print(res)\nexcept Exception as e:\n    print(\"\\nExpected exception when replacing all-null positions across DataFrame with int 0 (string column cannot accept):\")",
+                "old_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nOriginal DataFrame:\n      s    o\n0     a  1.0\n1  <NA>  NaN\n\nResult (unexpected success):\n   s    o\n0  a  1.0\n1  0  0.0\n",
+                "new_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nOriginal DataFrame:\n      s    o\n0     a  1.0\n1  <NA>  NaN\n\nExpected exception when replacing all-null positions across DataFrame with int 0 (string column cannot accept):\n"
+            },
+            "label": "coincidental fix",
+            "comment": "New version raises error, when replace element of string array with a value of another type. Old version terminates."
+        },
+        {
+            "test": {
+                "test_code": "# Example 9:\n# Provide a list-like (iterable) as the 'other' argument to perform elementwise replacement.\nimport pandas as pd\n\ns = pd.Series([\"aa\", \"bb\", \"cc\", \"dd\"], dtype=\"string\")\nmask = [True, False, True, False]\nother_list = [\"x\", \"y\", \"z\", \"w\"]\n\nprint(\"Original Series:\", s.tolist())\nprint(\"Mask:\", mask)\nprint(\"Other list:\", other_list)\n\nres = s.where(mask, other_list)",
+                "old_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nOriginal Series: ['aa', 'bb', 'cc', 'dd']\nMask: [True, False, True, False]\nOther list: ['x', 'y', 'z', 'w']\n",
+                "new_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nOriginal Series: ['aa', 'bb', 'cc', 'dd']\nMask: [True, False, True, False]\nOther list: ['x', 'y', 'z', 'w']\nTraceback (most recent call last):\n  File \"/tmp/Testora/Testora_test_code.py\", line 13, in <module>\n    res = s.where(mask, other_list)\n          ^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/pandas/pandas/core/generic.py\", line 9984, in where\n    return self._where(cond, other, inplace=inplace, axis=axis, level=level)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/pandas/pandas/core/generic.py\", line 9773, in _where\n    new_data = self._mgr.where(\n               ^^^^^^^^^^^^^^^^\n  File \"/home/pandas/pandas/core/internals/managers.py\", line 469, in where\n    return self.apply(\n           ^^^^^^^^^^^\n  File \"/home/pandas/pandas/core/internals/managers.py\", line 438, in apply\n    applied = getattr(b, f)(**kwargs)\n              ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/pandas/pandas/core/internals/blocks.py\", line 1671, in where\n    res_values = arr._where(cond, other).T\n                 ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/pandas/pandas/core/arrays/string_.py\", line 764, in _where\n    return ExtensionArray._where(self, mask, value)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/pandas/pandas/core/arrays/base.py\", line 2421, in _where\n    val = value[~mask]\n          ~~~~~^^^^^^^\nTypeError: only integer scalar arrays can be converted to a scalar index\n"
+            },
+            "label": "unintended",
+            "comment": "Replacement should work for elementwise replacement like in the old version"
+        }
+    ]
+}

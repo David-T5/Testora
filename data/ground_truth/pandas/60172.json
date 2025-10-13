@@ -1,0 +1,42 @@
+{
+    "pr_number": 60172,
+    "log_file": "60172_2025-10-06 10:18:41.json",
+    "differentiating_tests": [
+        {
+            "test": {
+                "test_code": "# Corner Example 1:\n# GH#60102 scenario: DataFrame with a datetime index but no columns -- shift with freq should move the index\nimport pandas as pd\n\ndates = pd.date_range(\"2020-01-01\", periods=3, freq=\"D\")\noffset = pd.offsets.Day(1)\ndf = pd.DataFrame(index=dates)  # no columns\nexpected_index = dates + offset\nprint(\"Original index:\", df.index)\n\nres = df.shift(freq=offset)\nprint(\"\\nAfter df.shift(freq=Day(1)) index:\", res.index)",
+                "old_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nOriginal index: DatetimeIndex(['2020-01-01', '2020-01-02', '2020-01-03'], dtype='datetime64[ns]', freq='D')\n\nAfter df.shift(freq=Day(1)) index: DatetimeIndex(['2020-01-01', '2020-01-02', '2020-01-03'], dtype='datetime64[ns]', freq='D')\n",
+                "new_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nOriginal index: DatetimeIndex(['2020-01-01', '2020-01-02', '2020-01-03'], dtype='datetime64[ns]', freq='D')\n\nAfter df.shift(freq=Day(1)) index: DatetimeIndex(['2020-01-02', '2020-01-03', '2020-01-04'], dtype='datetime64[ns]', freq='D')\n"
+            },
+            "label": "intended",
+            "comment": "Index is now shifted"
+        },
+        {
+            "test": {
+                "test_code": "# Corner Example 2:\n# Completely empty DataFrame (no index, no columns) with a freq: should still work and return an empty frame\nimport pandas as pd\n\ndf = pd.DataFrame()  # no rows, no columns\nprint(\"Original empty DataFrame:\\n\", df)\nres = df.shift(freq=pd.offsets.Day(1))",
+                "old_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nOriginal empty DataFrame:\n Empty DataFrame\nColumns: []\nIndex: []\n",
+                "new_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nOriginal empty DataFrame:\n Empty DataFrame\nColumns: []\nIndex: []\nTraceback (most recent call last):\n  File \"/tmp/Testora/Testora_test_code.py\", line 7, in <module>\n    res = df.shift(freq=pd.offsets.Day(1))\n          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/pandas/pandas/core/frame.py\", line 5797, in shift\n    return super().shift(\n           ^^^^^^^^^^^^^^\n  File \"/home/pandas/pandas/core/generic.py\", line 10210, in shift\n    return self._shift_with_freq(periods, axis, freq)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/pandas/pandas/core/generic.py\", line 10243, in _shift_with_freq\n    new_ax = index.shift(periods, freq)\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/pandas/pandas/core/indexes/base.py\", line 5854, in shift\n    raise NotImplementedError(\nNotImplementedError: This method is only implemented for DatetimeIndex, PeriodIndex and TimedeltaIndex; Got type RangeIndex\n"
+            },
+            "label": "unintended",
+            "comment": ""
+        },
+        {
+            "test": {
+                "test_code": "# Corner Example 6:\n# Empty DataFrame with index but no columns, negative freq via Timedelta with numpy timedelta64\nimport pandas as pd\nimport numpy as np\n\ndates = pd.date_range(\"2021-09-01\", periods=2, freq=\"D\")\ndf = pd.DataFrame(index=dates)  # no columns\nnp_td = np.timedelta64(2, \"D\")\ntd = pd.Timedelta(np_td)  # construct Pandas Timedelta from numpy timedelta64\nprint(\"Original index:\", df.index)\n\nres = df.shift(freq=-td)  # shift index backward by 2 days\nprint(\"\\nAfter df.shift(freq=-Timedelta(2 days)) index:\", res.index)",
+                "old_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nOriginal index: DatetimeIndex(['2021-09-01', '2021-09-02'], dtype='datetime64[ns]', freq='D')\n\nAfter df.shift(freq=-Timedelta(2 days)) index: DatetimeIndex(['2021-09-01', '2021-09-02'], dtype='datetime64[ns]', freq='D')\n",
+                "new_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nOriginal index: DatetimeIndex(['2021-09-01', '2021-09-02'], dtype='datetime64[ns]', freq='D')\n\nAfter df.shift(freq=-Timedelta(2 days)) index: DatetimeIndex(['2021-08-30', '2021-08-31'], dtype='datetime64[ns]', freq='D')\n"
+            },
+            "label": "nitended",
+            "comment": "Index is now shifted"
+        },
+        {
+            "test": {
+                "test_code": "# Corner Example 4:\n# DataFrame with zero columns but with a DatetimeIndex (len(index) > 0, len(columns) == 0)\n# DataFrame.empty is True in this situation. Earlier behavior returned a copy and did not apply freq.\n# After the diff, providing freq causes the index to be shifted even though there are no columns.\nimport pandas as pd\n\ndates = pd.date_range(\"2021-06-01\", periods=3, freq=\"D\")\ndf_zero_cols = pd.DataFrame(index=dates)  # no columns -> empty True\nprint(\"DataFrame with zero columns (empty True), original index:\")\nprint(df_zero_cols)\nshifted = df_zero_cols.shift(periods=1, freq=\"1D\")  # index should shift by 1 day\nprint(\"\\nAfter df_zero_cols.shift(periods=1, freq='1D') (index shifted though no columns):\")\nprint(shifted)",
+                "old_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nDataFrame with zero columns (empty True), original index:\nEmpty DataFrame\nColumns: []\nIndex: [2021-06-01 00:00:00, 2021-06-02 00:00:00, 2021-06-03 00:00:00]\n\nAfter df_zero_cols.shift(periods=1, freq='1D') (index shifted though no columns):\nEmpty DataFrame\nColumns: []\nIndex: [2021-06-01 00:00:00, 2021-06-02 00:00:00, 2021-06-03 00:00:00]\n",
+                "new_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nDataFrame with zero columns (empty True), original index:\nEmpty DataFrame\nColumns: []\nIndex: [2021-06-01 00:00:00, 2021-06-02 00:00:00, 2021-06-03 00:00:00]\n\nAfter df_zero_cols.shift(periods=1, freq='1D') (index shifted though no columns):\nEmpty DataFrame\nColumns: []\nIndex: [2021-06-02 00:00:00, 2021-06-03 00:00:00, 2021-06-04 00:00:00]\n"
+            },
+            "label": "intended",
+            "comment": "Index is now shifted"
+        }
+    ]
+}

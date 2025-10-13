@@ -1,0 +1,87 @@
+{
+    "pr_number": 60202,
+    "log_file": "60202_2025-10-08 09:36:54.json",
+    "differentiating_tests": [
+        {
+            "test": {
+                "test_code": "# Example 1:\n# Basic Series.where with string dtype, replacing masked positions with None\nimport pandas as pd\nimport numpy as np\n\ns = pd.Series([\"apple\", \"banana\", \"cherry\"], dtype=\"string\")\nmask = [True, False, True]\nprint(\"Original Series:\")\nprint(s)\nprint(\"Mask:\", mask)\n\nres = s.where(mask, None)\nprint(\"\\nResult of s.where(mask, None):\")\nprint(res)",
+                "old_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nOriginal Series:\n0     apple\n1    banana\n2    cherry\ndtype: string\nMask: [True, False, True]\n\nResult of s.where(mask, None):\n0     apple\n1      None\n2    cherry\ndtype: string\n",
+                "new_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nOriginal Series:\n0     apple\n1    banana\n2    cherry\ndtype: string\nMask: [True, False, True]\n\nResult of s.where(mask, None):\n0     apple\n1      <NA>\n2    cherry\ndtype: string\n"
+            },
+            "label": "intended",
+            "comment": ""
+        },
+        {
+            "test": {
+                "test_code": "# Example 5:\n# Using Series.mask (inverse of where). Show None is inserted where mask is True (mask means replace)\nimport pandas as pd\ns = pd.Series([\"alpha\", \"beta\", \"gamma\"], dtype=\"string\")\nreplace_mask = [False, True, False]\nprint(\"Original:\", s.tolist())\nprint(\"Replace-mask:\", replace_mask)\n\nres = s.mask(replace_mask, None)\nprint(\"Result of s.mask(replace_mask, None):\", res.tolist(), \"dtype:\", res.dtype)",
+                "old_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nOriginal: ['alpha', 'beta', 'gamma']\nReplace-mask: [False, True, False]\nResult of s.mask(replace_mask, None): ['alpha', None, 'gamma'] dtype: string\n",
+                "new_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nOriginal: ['alpha', 'beta', 'gamma']\nReplace-mask: [False, True, False]\nResult of s.mask(replace_mask, None): ['alpha', <NA>, 'gamma'] dtype: string\n"
+            },
+            "label": "intended",
+            "comment": ""
+        },
+        {
+            "test": {
+                "test_code": "# Example 7:\n# Replacing with numpy.nan (np.nan) - for string dtype this becomes missing (<NA>), dtype preserved\nimport pandas as pd\nimport numpy as np\ns = pd.Series([\"dog\", \"cat\", \"bird\"], dtype=\"string\")\nmask = [True, False, True]\nprint(\"Original:\", s.tolist())\n\nres = s.where(mask, np.nan)\nprint(\"Result of s.where(mask, np.nan):\", res.tolist())",
+                "old_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nOriginal: ['dog', 'cat', 'bird']\nResult of s.where(mask, np.nan): ['dog', nan, 'bird']\n",
+                "new_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nOriginal: ['dog', 'cat', 'bird']\nResult of s.where(mask, np.nan): ['dog', <NA>, 'bird']\n"
+            },
+            "label": "intended",
+            "comment": ""
+        },
+        {
+            "test": {
+                "test_code": "# Example 8:\n# When the \"other\" argument is a python list with None/pd.NA per-element replacements\nimport pandas as pd\ns = pd.Series([\"red\", \"green\", \"blue\"], dtype=\"string\")\nother = [None, \"G\", pd.NA]\nmask = [True, False, True]\nprint(\"s:\", s.tolist())\nprint(\"other list:\", other)\nprint(\"mask:\", mask)\n\nres = s.where(mask, other)",
+                "old_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\ns: ['red', 'green', 'blue']\nother list: [None, 'G', <NA>]\nmask: [True, False, True]\n",
+                "new_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\ns: ['red', 'green', 'blue']\nother list: [None, 'G', <NA>]\nmask: [True, False, True]\nTraceback (most recent call last):\n  File \"/tmp/Testora/Testora_test_code.py\", line 11, in <module>\n    res = s.where(mask, other)\n          ^^^^^^^^^^^^^^^^^^^^\n  File \"/home/pandas/pandas/core/generic.py\", line 10990, in where\n    return self._where(cond, other, inplace, axis, level)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/pandas/pandas/core/generic.py\", line 10765, in _where\n    new_data = self._mgr.where(\n               ^^^^^^^^^^^^^^^^\n  File \"/home/pandas/pandas/core/internals/base.py\", line 204, in where\n    return self.apply_with_block(\n           ^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/pandas/pandas/core/internals/managers.py\", line 363, in apply\n    applied = getattr(b, f)(**kwargs)\n              ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/pandas/pandas/core/internals/blocks.py\", line 2112, in where\n    res_values = arr._where(cond, other).T\n                 ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/pandas/pandas/core/arrays/string_.py\", line 764, in _where\n    return ExtensionArray._where(self, mask, value)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/pandas/pandas/core/arrays/base.py\", line 2163, in _where\n    val = value[~mask]\n          ~~~~~^^^^^^^\nTypeError: only integer scalar arrays can be converted to a scalar index\n"
+            },
+            "label": "unintended",
+            "comment": "List should work as iterable for replacing values. In this case a string is replaced by a string in a dtype=string series, which should not raise an error."
+        },
+        {
+            "test": {
+                "test_code": "# Example 9:\n# Comparison between Series.where and numpy.where on the underlying array.\n# numpy.where on the extension array's .to_numpy() (object) can behave differently with None/pd.NA.\nimport pandas as pd\nimport numpy as np\ns = pd.Series([\"p\", \"q\", \"r\"], dtype=\"string\")\nmask = np.array([True, False, True])\nprint(\"Series:\", s.tolist())\nprint(\"Mask:\", mask.tolist())\n\nres_series = s.where(mask, None)\nres_numpy = np.where(mask, s.to_numpy(), None)  # returns an object ndarray\nprint(\"\\nResult of s.where(mask, None):\", res_series.tolist(), \"dtype:\", res_series.dtype)",
+                "old_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nSeries: ['p', 'q', 'r']\nMask: [True, False, True]\n\nResult of s.where(mask, None): ['p', None, 'r'] dtype: string\n",
+                "new_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nSeries: ['p', 'q', 'r']\nMask: [True, False, True]\n\nResult of s.where(mask, None): ['p', <NA>, 'r'] dtype: string\n"
+            },
+            "label": "intended",
+            "comment": ""
+        },
+        {
+            "test": {
+                "test_code": "# Corner Example 2:\n# All False mask results in all replacements; ensure pd.NA/None end up as missing values (<NA>) not strings\nimport pandas as pd\ns = pd.Series([\"A\", \"B\", \"C\"], dtype=\"string\")\nmask = [False, False, False]\nprint(\"Original:\", s.tolist())\nres_none = s.where(mask, None)\nres_pdna = s.where(mask, pd.NA)\nprint(\"\\nAll False -> s.where(mask, None):\", res_none.tolist(), \"dtype:\", res_none.dtype)",
+                "old_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nOriginal: ['A', 'B', 'C']\n\nAll False -> s.where(mask, None): [None, None, None] dtype: string\n",
+                "new_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nOriginal: ['A', 'B', 'C']\n\nAll False -> s.where(mask, None): [<NA>, <NA>, <NA>] dtype: string\n"
+            },
+            "label": "intended",
+            "comment": ""
+        },
+        {
+            "test": {
+                "test_code": "# Corner Example 3:\n# Mixed replacement values (integers, booleans) get coerced to strings except for None/pd.NA which become <NA>\nimport pandas as pd\ns = pd.Series([\"10\", \"20\", \"30\"], dtype=\"string\")\nmask = [True, False, True]\nprint(\"Original:\", s.tolist())\n\nres_int = s.where(mask, 0)",
+                "old_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nOriginal: ['10', '20', '30']\n",
+                "new_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nOriginal: ['10', '20', '30']\nTraceback (most recent call last):\n  File \"/tmp/Testora/Testora_test_code.py\", line 8, in <module>\n    res_int = s.where(mask, 0)\n              ^^^^^^^^^^^^^^^^\n  File \"/home/pandas/pandas/core/generic.py\", line 10990, in where\n    return self._where(cond, other, inplace, axis, level)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/pandas/pandas/core/generic.py\", line 10765, in _where\n    new_data = self._mgr.where(\n               ^^^^^^^^^^^^^^^^\n  File \"/home/pandas/pandas/core/internals/base.py\", line 204, in where\n    return self.apply_with_block(\n           ^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/pandas/pandas/core/internals/managers.py\", line 363, in apply\n    applied = getattr(b, f)(**kwargs)\n              ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/pandas/pandas/core/internals/blocks.py\", line 2112, in where\n    res_values = arr._where(cond, other).T\n                 ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/pandas/pandas/core/arrays/string_.py\", line 764, in _where\n    return ExtensionArray._where(self, mask, value)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/pandas/pandas/core/arrays/base.py\", line 2167, in _where\n    result[~mask] = val\n    ~~~~~~^^^^^^^\n  File \"/home/pandas/pandas/core/arrays/string_.py\", line 734, in __setitem__\n    raise TypeError(\nTypeError: Cannot set non-string value '0' into a StringArray.\n"
+            },
+            "label": "intended",
+            "comment": ""
+        },
+        {
+            "test": {
+                "test_code": "# Corner Example 9:\n# Using numpy.nan vs pd.NA vs None differences: all become missing under string dtype; show the reprs explicitly\nimport pandas as pd\nimport numpy as np\ns = pd.Series([\"alpha\", \"beta\", \"gamma\"], dtype=\"string\")\nmask = [True, False, True]\n\nr_nan = s.where(mask, np.nan)\nr_none = s.where(mask, None)\nr_pdna = s.where(mask, pd.NA)\nprint(\"np.nan replacement repr:\", [repr(x) for x in r_nan.tolist()])",
+                "old_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nnp.nan replacement repr: [\"'alpha'\", 'nan', \"'gamma'\"]\n",
+                "new_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nnp.nan replacement repr: [\"'alpha'\", '<NA>', \"'gamma'\"]\n"
+            },
+            "label": "intended",
+            "comment": ""
+        },
+        {
+            "test": {
+                "test_code": "# Corner Example 10:\n# Large-scale example but deterministic: replacing every 3rd element with None using a pattern mask\nimport pandas as pd\ns = pd.Series([str(i) for i in range(12)], dtype=\"string\")\nmask = [(i % 3) != 1 for i in range(len(s))]  # True except for indices 1,4,7,10\nprint(\"Original (first 12):\", s.tolist())\nprint(\"Mask pattern (first 12):\", mask)\n\nres = s.where(mask, None)\nprint(\"Result (first 12):\", res.tolist(), \"dtype:\", res.dtype)",
+                "old_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nOriginal (first 12): ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11']\nMask pattern (first 12): [True, False, True, True, False, True, True, False, True, True, False, True]\nResult (first 12): ['0', None, '2', '3', None, '5', '6', None, '8', '9', None, '11'] dtype: string\n",
+                "new_output": "  self.warn(\"--include is ignored because --source is set\", slug=\"include-ignored\")\nOriginal (first 12): ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11']\nMask pattern (first 12): [True, False, True, True, False, True, True, False, True, True, False, True]\nResult (first 12): ['0', <NA>, '2', '3', <NA>, '5', '6', <NA>, '8', '9', <NA>, '11'] dtype: string\n"
+            },
+            "label": "intended",
+            "comment": ""
+        }
+    ]
+}
