@@ -31,7 +31,7 @@ classification_temp = 1.0
 # classification_temp = 0.6
 
 # different prompts for classification task
-classification_prompt_version = 9
+classification_prompt_version = 91
 
 ref_issues = True
 ref_comments = True
