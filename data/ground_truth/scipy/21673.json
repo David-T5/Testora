@@ -1,0 +1,24 @@
+{
+    "pr_number": 21673,
+    "log_file": "21673_2025-06-02 09:07:28.json",
+    "differentiating_tests": [
+        {
+            "test": {
+                "test_code": "# Example 3:\nimport numpy as np\nfrom scipy.signal import ShortTimeFFT\n\n# Two-dimensional input signal\nSFT = ShortTimeFFT.from_window('hann', fs=1, nperseg=4, noverlap=2, mfft=8, phase_shift=0)\nx = np.array([[0, 1, 2, 3], [4, 5, 6, 7]])\nSx = SFT.stft(x)\ny = SFT.istft(Sx)",
+                "old_output": "Traceback (most recent call last):\n  File \"/tmp/Testora/Testora_test_code.py\", line 9, in <module>\n    y = SFT.istft(Sx)\n  File \"/home/scipy/scipy/signal/_short_time_fft.py\", line 1070, in istft\n    xs = self._ifft_func(S[..., :, q_ - self.p_min]) * self.dual_win\n         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~\nValueError: operands could not be broadcast together with shapes (2,8) (4,) \n",
+                "new_output": ""
+            },
+            "label": "intended",
+            "comment": "https://github.com/scipy/scipy/issues/21671"
+        },
+        {
+            "test": {
+                "test_code": "# Example 10:\nimport numpy as np\nfrom scipy.signal import ShortTimeFFT\n\n# Just checking input consistency for multi-channel input\nSFT = ShortTimeFFT.from_window('hann', fs=1, nperseg=4, noverlap=2, mfft=8, phase_shift=None)\nx = np.array([[0, 1, 2, 3], [4, 5, 6, 7]])\nSx = SFT.stft(x)\ny = SFT.istft(Sx)",
+                "old_output": "Traceback (most recent call last):\n  File \"/tmp/Testora/Testora_test_code.py\", line 9, in <module>\n    y = SFT.istft(Sx)\n  File \"/home/scipy/scipy/signal/_short_time_fft.py\", line 1070, in istft\n    xs = self._ifft_func(S[..., :, q_ - self.p_min]) * self.dual_win\n         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~\nValueError: operands could not be broadcast together with shapes (2,8) (4,) \n",
+                "new_output": ""
+            },
+            "label": "intended",
+            "comment": "https://github.com/scipy/scipy/issues/21671"
+        }
+    ]
+}

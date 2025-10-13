@@ -1,0 +1,15 @@
+{
+    "pr_number": 21726,
+    "log_file": "data/results/scipy/21726_2025-06-04 14:48:43.json",
+    "differentiating_tests": [
+        {
+            "test": {
+                "test_code": "# Example 7:\nimport numpy as np\nfrom scipy.linalg import solve\n\n# Solving a banded system (3 diagonals)\nA = np.array([[0, 1, 0, 0], [2, 0, 3, 0], [0, 4, 0, 5], [0, 0, 6, 0]])\nb = np.array([1, 2, 3, 4])\nx = solve(A, b, assume_a='banded')",
+                "old_output": "Traceback (most recent call last):\n  File \"/tmp/Testora/Testora_test_code.py\", line 8, in <module>\n    x = solve(A, b, assume_a='banded')\n  File \"/home/scipy/scipy/linalg/_basic.py\", line 207, in solve\n    raise ValueError(f'{assume_a} is not a recognized matrix structure')\nValueError: banded is not a recognized matrix structure\n",
+                "new_output": ""
+            },
+            "label": "intended",
+            "comment": "PR added banded as recognized matrix structure"
+        }
+    ]
+}

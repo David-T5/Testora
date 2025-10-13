@@ -1,0 +1,33 @@
+{
+    "pr_number": 21684,
+    "log_file": "21684_2025-06-02 09:07:28.json",
+    "differentiating_tests": [
+        {
+            "test": {
+                "test_code": "# Example 1:\nimport numpy as np\nfrom scipy.stats import dirichlet_multinomial\n\nalpha = np.array([1., 2.])\nn = 0\nx = np.array([0, 0])\ndist = dirichlet_multinomial(alpha, n)",
+                "old_output": "Traceback (most recent call last):\n  File \"/tmp/Testora/Testora_test_code.py\", line 8, in <module>\n    dist = dirichlet_multinomial(alpha, n)\n  File \"/home/scipy/scipy/stats/_multivariate.py\", line 6107, in __call__\n    return dirichlet_multinomial_frozen(alpha, n, seed=seed)\n  File \"/home/scipy/scipy/stats/_multivariate.py\", line 6218, in __init__\n    alpha, Sa, n = _dirichlet_multinomial_check_parameters(alpha, n)\n                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^\n  File \"/home/scipy/scipy/stats/_multivariate.py\", line 5985, in _dirichlet_multinomial_check_parameters\n    raise ValueError(\"`n` must be a positive integer.\")\nValueError: `n` must be a positive integer.\n",
+                "new_output": ""
+            },
+            "label": "intended",
+            "comment": ""
+        },
+        {
+            "test": {
+                "test_code": "# Example 2:\nimport numpy as np\nfrom scipy.stats import dirichlet_multinomial\n\nalpha = np.array([1., 1.])\nn = 0\nx = np.array([1, 1])\ndist = dirichlet_multinomial(alpha, n)",
+                "old_output": "Traceback (most recent call last):\n  File \"/tmp/Testora/Testora_test_code.py\", line 8, in <module>\n    dist = dirichlet_multinomial(alpha, n)\n  File \"/home/scipy/scipy/stats/_multivariate.py\", line 6107, in __call__\n    return dirichlet_multinomial_frozen(alpha, n, seed=seed)\n  File \"/home/scipy/scipy/stats/_multivariate.py\", line 6218, in __init__\n    alpha, Sa, n = _dirichlet_multinomial_check_parameters(alpha, n)\n                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^\n  File \"/home/scipy/scipy/stats/_multivariate.py\", line 5985, in _dirichlet_multinomial_check_parameters\n    raise ValueError(\"`n` must be a positive integer.\")\nValueError: `n` must be a positive integer.\n",
+                "new_output": ""
+            },
+            "label": "intended",
+            "comment": ""
+        },
+        {
+            "test": {
+                "test_code": "# Example 10:\nimport numpy as np\nfrom scipy.stats import dirichlet_multinomial\n\nalpha = np.array([1., 1.])\nn = 0\nx = np.array([0, 0])\ndist = dirichlet_multinomial(alpha, n)",
+                "old_output": "Traceback (most recent call last):\n  File \"/tmp/Testora/Testora_test_code.py\", line 8, in <module>\n    dist = dirichlet_multinomial(alpha, n)\n  File \"/home/scipy/scipy/stats/_multivariate.py\", line 6107, in __call__\n    return dirichlet_multinomial_frozen(alpha, n, seed=seed)\n  File \"/home/scipy/scipy/stats/_multivariate.py\", line 6218, in __init__\n    alpha, Sa, n = _dirichlet_multinomial_check_parameters(alpha, n)\n                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^\n  File \"/home/scipy/scipy/stats/_multivariate.py\", line 5985, in _dirichlet_multinomial_check_parameters\n    raise ValueError(\"`n` must be a positive integer.\")\nValueError: `n` must be a positive integer.\n",
+                "new_output": ""
+            },
+            "label": "intended",
+            "comment": ""
+        }
+    ]
+}

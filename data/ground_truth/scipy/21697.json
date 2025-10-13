@@ -1,0 +1,132 @@
+{
+    "pr_number": 21697,
+    "log_file": "21697_2025-06-04 14:48:43.json",
+    "differentiating_tests": [
+        {
+            "test": {
+                "test_code": "# Example 1:\nimport numpy as np\nfrom scipy.signal import lombscargle\n\n# Sample input data\nx = np.array([0, 1, 2, 3])\ny = np.array([1, 2, 3, 4])\nw = np.linspace(0, 10, 100)  # Frequencies\n\n# Compute Lomb-Scargle periodogram using default floating_mean\npgram_default = lombscargle(x, y, w)",
+                "old_output": "/home/scipy/scipy/signal/_spectral_py.py:272: RuntimeWarning: invalid value encountered in scalar divide\n  a[i] = (YC * SS - YS * CS) / D\n/home/scipy/scipy/signal/_spectral_py.py:273: RuntimeWarning: invalid value encountered in scalar divide\n  b[i] = (YS * CC - YC * CS) / D\n",
+                "new_output": "/home/scipy/scipy/signal/_spectral_py.py:286: RuntimeWarning: invalid value encountered in scalar divide\n  a[i] = (YC * SS - YS * CS) / D\n/home/scipy/scipy/signal/_spectral_py.py:287: RuntimeWarning: invalid value encountered in scalar divide\n  b[i] = (YS * CC - YC * CS) / D\n"
+            },
+            "label": "intended",
+            "comment": "timeout of testora test execution may be too short"
+        },
+        {
+            "test": {
+                "test_code": "# Example 2:\nimport numpy as np\nfrom scipy.signal import lombscargle\n\n# Sample input data\nx = np.array([0, 1, 2, 3])\ny = np.array([1, 2, 3, 4])\nw = np.linspace(0, 10, 100)  # Frequencies\n\n# Compute Lomb-Scargle periodogram with floating_mean=True\npgram_floating_mean = lombscargle(x, y, w, floating_mean=True)",
+                "old_output": "/home/scipy/scipy/signal/_spectral_py.py:272: RuntimeWarning: invalid value encountered in scalar divide\n  a[i] = (YC * SS - YS * CS) / D\n/home/scipy/scipy/signal/_spectral_py.py:273: RuntimeWarning: invalid value encountered in scalar divide\n  b[i] = (YS * CC - YC * CS) / D\n",
+                "new_output": "/home/scipy/scipy/signal/_spectral_py.py:286: RuntimeWarning: invalid value encountered in scalar divide\n  a[i] = (YC * SS - YS * CS) / D\n/home/scipy/scipy/signal/_spectral_py.py:287: RuntimeWarning: invalid value encountered in scalar divide\n  b[i] = (YS * CC - YC * CS) / D\n"
+            },
+            "label": "intended",
+            "comment": ""
+        },
+        {
+            "test": {
+                "test_code": "# Example 3:\nimport numpy as np\nfrom scipy.signal import lombscargle\n\n# Sample input data\nx = np.array([0, 1, 2, 3])\ny = np.array([1, 2, 3, 4])\nw = np.linspace(0, 10, 100)  # Frequencies\n\n# Compute Lomb-Scargle periodogram with normalization\npgram_norm = lombscargle(x, y, w, normalize=True)",
+                "old_output": "/home/scipy/scipy/signal/_spectral_py.py:272: RuntimeWarning: invalid value encountered in scalar divide\n  a[i] = (YC * SS - YS * CS) / D\n/home/scipy/scipy/signal/_spectral_py.py:273: RuntimeWarning: invalid value encountered in scalar divide\n  b[i] = (YS * CC - YC * CS) / D\n",
+                "new_output": "/home/scipy/scipy/signal/_spectral_py.py:286: RuntimeWarning: invalid value encountered in scalar divide\n  a[i] = (YC * SS - YS * CS) / D\n/home/scipy/scipy/signal/_spectral_py.py:287: RuntimeWarning: invalid value encountered in scalar divide\n  b[i] = (YS * CC - YC * CS) / D\n"
+            },
+            "label": "intended",
+            "comment": ""
+        },
+        {
+            "test": {
+                "test_code": "# Example 4:\nimport numpy as np\nfrom scipy.signal import lombscargle\n\n# Sample input data\nx = np.array([0, 1, 2, 3])\ny = np.array([1, 2, 3, 4])\nw = np.linspace(0, 10, 100)  # Frequencies\n\n# Compute Lomb-Scargle periodogram with amplitude normalization\npgram_amp = lombscargle(x, y, w, normalize='amplitude')",
+                "old_output": "/home/scipy/scipy/signal/_spectral_py.py:272: RuntimeWarning: invalid value encountered in scalar divide\n  a[i] = (YC * SS - YS * CS) / D\n/home/scipy/scipy/signal/_spectral_py.py:273: RuntimeWarning: invalid value encountered in scalar divide\n  b[i] = (YS * CC - YC * CS) / D\n",
+                "new_output": "/home/scipy/scipy/signal/_spectral_py.py:286: RuntimeWarning: invalid value encountered in scalar divide\n  a[i] = (YC * SS - YS * CS) / D\n/home/scipy/scipy/signal/_spectral_py.py:287: RuntimeWarning: invalid value encountered in scalar divide\n  b[i] = (YS * CC - YC * CS) / D\n"
+            },
+            "label": "intended",
+            "comment": ""
+        },
+        {
+            "test": {
+                "test_code": "# Example 5:\nimport numpy as np\nfrom scipy.signal import lombscargle\n\n# Sample input data\nx = np.array([0, 1, 2, 3])\ny = np.array([1, 2, 3, 4])\nw = np.linspace(0, 10, 100)  # Frequencies\n\n# Compute Lomb-Scargle periodogram with weighted samples\nweights = np.array([1, 1, 1, 1])\npgram_weighted = lombscargle(x, y, w, weights=weights)",
+                "old_output": "/home/scipy/scipy/signal/_spectral_py.py:272: RuntimeWarning: invalid value encountered in scalar divide\n  a[i] = (YC * SS - YS * CS) / D\n/home/scipy/scipy/signal/_spectral_py.py:273: RuntimeWarning: invalid value encountered in scalar divide\n  b[i] = (YS * CC - YC * CS) / D\n",
+                "new_output": "/home/scipy/scipy/signal/_spectral_py.py:286: RuntimeWarning: invalid value encountered in scalar divide\n  a[i] = (YC * SS - YS * CS) / D\n/home/scipy/scipy/signal/_spectral_py.py:287: RuntimeWarning: invalid value encountered in scalar divide\n  b[i] = (YS * CC - YC * CS) / D\n"
+            },
+            "label": "intended",
+            "comment": ""
+        },
+        {
+            "test": {
+                "test_code": "# Example 6:\nimport numpy as np\nfrom scipy.signal import lombscargle\n\n# Sample input data\nx = np.array([0, 1, 2, 3])\ny = np.array([1, 2, 3, 4])\nw = np.linspace(0, 10, 100)  # Frequencies\n\n# Using precenter with default floating_mean\npgram_precenter = lombscargle(x, y, w, precenter=True)",
+                "old_output": "/home/scipy/scipy/signal/_spectral_py.py:272: RuntimeWarning: invalid value encountered in scalar divide\n  a[i] = (YC * SS - YS * CS) / D\n/home/scipy/scipy/signal/_spectral_py.py:273: RuntimeWarning: invalid value encountered in scalar divide\n  b[i] = (YS * CC - YC * CS) / D\n",
+                "new_output": "/home/scipy/scipy/signal/_spectral_py.py:286: RuntimeWarning: invalid value encountered in scalar divide\n  a[i] = (YC * SS - YS * CS) / D\n/home/scipy/scipy/signal/_spectral_py.py:287: RuntimeWarning: invalid value encountered in scalar divide\n  b[i] = (YS * CC - YC * CS) / D\n"
+            },
+            "label": "intended",
+            "comment": ""
+        },
+        {
+            "test": {
+                "test_code": "# Example 7:\nimport numpy as np\nfrom scipy.signal import lombscargle\n\n# Sample input data\nx = np.array([0, 1, 2, 3])\ny = np.array([1, 2, 3, 4])\nw = np.linspace(0, 10, 100)  # Frequencies\n\n# Compute Lomb-Scargle periodogram without floating_mean\npgram_no_floating = lombscargle(x, y, w, floating_mean=False)",
+                "old_output": "/home/scipy/scipy/signal/_spectral_py.py:272: RuntimeWarning: invalid value encountered in scalar divide\n  a[i] = (YC * SS - YS * CS) / D\n/home/scipy/scipy/signal/_spectral_py.py:273: RuntimeWarning: invalid value encountered in scalar divide\n  b[i] = (YS * CC - YC * CS) / D\n",
+                "new_output": "/home/scipy/scipy/signal/_spectral_py.py:286: RuntimeWarning: invalid value encountered in scalar divide\n  a[i] = (YC * SS - YS * CS) / D\n/home/scipy/scipy/signal/_spectral_py.py:287: RuntimeWarning: invalid value encountered in scalar divide\n  b[i] = (YS * CC - YC * CS) / D\n"
+            },
+            "label": "intended",
+            "comment": ""
+        },
+        {
+            "test": {
+                "test_code": "# Example 8:\nimport numpy as np\nfrom scipy.signal import lombscargle\n\n# Sample input data\nx = np.array([0, 1, 2, 3])\ny = np.array([1, 2, 3, 4])\nw = np.linspace(0, 10, 100)  # Frequencies\n\n# Calculate Lomb-Scargle with precenter and floating mean\npgram_with_mean = lombscargle(x, y, w, precenter=True, floating_mean=True)",
+                "old_output": "/home/scipy/scipy/signal/_spectral_py.py:272: RuntimeWarning: invalid value encountered in scalar divide\n  a[i] = (YC * SS - YS * CS) / D\n/home/scipy/scipy/signal/_spectral_py.py:273: RuntimeWarning: invalid value encountered in scalar divide\n  b[i] = (YS * CC - YC * CS) / D\n",
+                "new_output": "/home/scipy/scipy/signal/_spectral_py.py:286: RuntimeWarning: invalid value encountered in scalar divide\n  a[i] = (YC * SS - YS * CS) / D\n/home/scipy/scipy/signal/_spectral_py.py:287: RuntimeWarning: invalid value encountered in scalar divide\n  b[i] = (YS * CC - YC * CS) / D\n"
+            },
+            "label": "intended",
+            "comment": ""
+        },
+        {
+            "test": {
+                "test_code": "# Example 9:\nimport numpy as np\nfrom scipy.signal import lombscargle\n\n# Sample input data with only two points\nx = np.array([0, 1])\ny = np.array([1, 3])\nw = np.linspace(0, 10, 100)  # Frequencies\n\n# Compute Lomb-Scargle periodogram \npgram_two_points = lombscargle(x, y, w)",
+                "old_output": "/home/scipy/scipy/signal/_spectral_py.py:272: RuntimeWarning: invalid value encountered in scalar divide\n  a[i] = (YC * SS - YS * CS) / D\n/home/scipy/scipy/signal/_spectral_py.py:273: RuntimeWarning: invalid value encountered in scalar divide\n  b[i] = (YS * CC - YC * CS) / D\n/home/scipy/scipy/signal/_spectral_py.py:272: RuntimeWarning: divide by zero encountered in scalar divide\n  a[i] = (YC * SS - YS * CS) / D\n/home/scipy/scipy/signal/_spectral_py.py:273: RuntimeWarning: divide by zero encountered in scalar divide\n  b[i] = (YS * CC - YC * CS) / D\n/home/scipy/scipy/signal/_spectral_py.py:277: RuntimeWarning: invalid value encountered in scalar add\n  pgram[i] = 2.0 * (a[i] * YC + b[i] * YS)\n",
+                "new_output": "/home/scipy/scipy/signal/_spectral_py.py:286: RuntimeWarning: invalid value encountered in scalar divide\n  a[i] = (YC * SS - YS * CS) / D\n/home/scipy/scipy/signal/_spectral_py.py:287: RuntimeWarning: invalid value encountered in scalar divide\n  b[i] = (YS * CC - YC * CS) / D\n"
+            },
+            "label": "intended",
+            "comment": ""
+        },
+        {
+            "test": {
+                "test_code": "# Example 10:\nimport numpy as np\nfrom scipy.signal import lombscargle\n\n# Sample input data with zero variance in y\nx = np.array([0, 1, 2, 3])\ny = np.array([1, 1, 1, 1])  # All same values\nw = np.linspace(0, 10, 100)  # Frequencies\n\n# Compute Lomb-Scargle periodogram\npgram_zero_variance = lombscargle(x, y, w)",
+                "old_output": "/home/scipy/scipy/signal/_spectral_py.py:272: RuntimeWarning: invalid value encountered in scalar divide\n  a[i] = (YC * SS - YS * CS) / D\n/home/scipy/scipy/signal/_spectral_py.py:273: RuntimeWarning: invalid value encountered in scalar divide\n  b[i] = (YS * CC - YC * CS) / D\n",
+                "new_output": "/home/scipy/scipy/signal/_spectral_py.py:286: RuntimeWarning: invalid value encountered in scalar divide\n  a[i] = (YC * SS - YS * CS) / D\n/home/scipy/scipy/signal/_spectral_py.py:287: RuntimeWarning: invalid value encountered in scalar divide\n  b[i] = (YS * CC - YC * CS) / D\n"
+            },
+            "label": "intended",
+            "comment": ""
+        },
+        {
+            "test": {
+                "test_code": "# Example 14:\nimport numpy as np\nfrom scipy.signal import lombscargle\n\n# Sample input data with very large numbers\nx = np.array([0, 1, 2, 3])\ny = np.array([1e12, 2e12, 3e12, 4e12])\nw = np.linspace(0, 10, 100)  # Frequencies\n\n# Compute Lomb-Scargle periodogram with large y values\npgram_large_values = lombscargle(x, y, w)",
+                "old_output": "/home/scipy/scipy/signal/_spectral_py.py:272: RuntimeWarning: invalid value encountered in scalar divide\n  a[i] = (YC * SS - YS * CS) / D\n/home/scipy/scipy/signal/_spectral_py.py:273: RuntimeWarning: invalid value encountered in scalar divide\n  b[i] = (YS * CC - YC * CS) / D\n",
+                "new_output": "/home/scipy/scipy/signal/_spectral_py.py:286: RuntimeWarning: invalid value encountered in scalar divide\n  a[i] = (YC * SS - YS * CS) / D\n/home/scipy/scipy/signal/_spectral_py.py:287: RuntimeWarning: invalid value encountered in scalar divide\n  b[i] = (YS * CC - YC * CS) / D\n"
+            },
+            "label": "intended",
+            "comment": ""
+        },
+        {
+            "test": {
+                "test_code": "# Example 15:\nimport numpy as np\nfrom scipy.signal import lombscargle\n\n# Sample input data with negative values\nx = np.array([0, 1, 2, 3])\ny = np.array([-1, -2, -3, -4])\nw = np.linspace(0, 10, 100)  # Frequencies\n\n# Compute Lomb-Scargle periodogram with negative values in y\npgram_negative = lombscargle(x, y, w)",
+                "old_output": "/home/scipy/scipy/signal/_spectral_py.py:272: RuntimeWarning: invalid value encountered in scalar divide\n  a[i] = (YC * SS - YS * CS) / D\n/home/scipy/scipy/signal/_spectral_py.py:273: RuntimeWarning: invalid value encountered in scalar divide\n  b[i] = (YS * CC - YC * CS) / D\n",
+                "new_output": "/home/scipy/scipy/signal/_spectral_py.py:286: RuntimeWarning: invalid value encountered in scalar divide\n  a[i] = (YC * SS - YS * CS) / D\n/home/scipy/scipy/signal/_spectral_py.py:287: RuntimeWarning: invalid value encountered in scalar divide\n  b[i] = (YS * CC - YC * CS) / D\n"
+            },
+            "label": "intended",
+            "comment": ""
+        },
+        {
+            "test": {
+                "test_code": "# Example 16:\nimport numpy as np\nfrom scipy.signal import lombscargle\n\n# Provide very high frequency values\nx = np.array([0, 1, 2, 3])\ny = np.array([1, 2, 3, 4])\nw = np.linspace(0, 1000, 100)  # Very high frequencies\n\n# Compute Lomb-Scargle periodogram with high frequency range\npgram_high_freq = lombscargle(x, y, w)",
+                "old_output": "/home/scipy/scipy/signal/_spectral_py.py:272: RuntimeWarning: invalid value encountered in scalar divide\n  a[i] = (YC * SS - YS * CS) / D\n/home/scipy/scipy/signal/_spectral_py.py:273: RuntimeWarning: invalid value encountered in scalar divide\n  b[i] = (YS * CC - YC * CS) / D\n",
+                "new_output": "/home/scipy/scipy/signal/_spectral_py.py:286: RuntimeWarning: invalid value encountered in scalar divide\n  a[i] = (YC * SS - YS * CS) / D\n/home/scipy/scipy/signal/_spectral_py.py:287: RuntimeWarning: invalid value encountered in scalar divide\n  b[i] = (YS * CC - YC * CS) / D\n"
+            },
+            "label": "intended",
+            "comment": ""
+        },
+        {
+            "test": {
+                "test_code": "# Example 19:\nimport numpy as np\nfrom scipy.signal import lombscargle\n\n# Sample input data with a repeated pattern\nx = np.array([0, 1, 2, 3, 0, 1, 2, 3])\ny = np.array([1, 2, 3, 4, 1, 2, 3, 4])\nw = np.linspace(0, 10, 100)  # Frequencies\n\n# Compute Lomb-Scargle periodogram with repeated data\npgram_repeated = lombscargle(x, y, w)",
+                "old_output": "/home/scipy/scipy/signal/_spectral_py.py:272: RuntimeWarning: invalid value encountered in scalar divide\n  a[i] = (YC * SS - YS * CS) / D\n/home/scipy/scipy/signal/_spectral_py.py:273: RuntimeWarning: invalid value encountered in scalar divide\n  b[i] = (YS * CC - YC * CS) / D\n",
+                "new_output": "/home/scipy/scipy/signal/_spectral_py.py:286: RuntimeWarning: invalid value encountered in scalar divide\n  a[i] = (YC * SS - YS * CS) / D\n/home/scipy/scipy/signal/_spectral_py.py:287: RuntimeWarning: invalid value encountered in scalar divide\n  b[i] = (YS * CC - YC * CS) / D\n"
+            },
+            "label": "intended",
+            "comment": ""
+        }
+    ]
+}

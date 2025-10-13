@@ -1,0 +1,15 @@
+{
+    "pr_number": 21712,
+    "log_file": "21712_2025-06-04 14:48:43.json",
+    "differentiating_tests": [
+        {
+            "test": {
+                "test_code": "# Example 4: Logsumexp with small imaginary component\nimport numpy as np\nfrom scipy.special import logsumexp\n\na = np.array([0.0 + 2.220446049250313e-17j])\nresult = logsumexp(a)\nprint(\"Logsumexp result with small imaginary component:\", result)",
+                "old_output": "Logsumexp result with small imaginary component: 0j\n",
+                "new_output": "Logsumexp result with small imaginary component: 2.220446049250313e-17j\n"
+            },
+            "label": "intended",
+            "comment": ""
+        }
+    ]
+}

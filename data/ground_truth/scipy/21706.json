@@ -1,0 +1,15 @@
+{
+    "pr_number": 21706,
+    "log_file": "21706_2025-06-04 14:48:43.json",
+    "differentiating_tests": [
+                {
+            "test": {
+                "test_code": "# Example 15:\nimport numpy as np\nfrom scipy.signal import sosfilt\n\nsos = np.array([[1, 0, 0, 1, 0, 0]], dtype=object)  # Object coefficients\nx = np.array([1, 1, np.nan, 1, 1])  # Input with NaN\ny = sosfilt(sos, x)",
+                "old_output": "",
+                "new_output": "/tmp/Testora/Testora_test_code.py:7: DeprecationWarning: dtype=object is not supported by sosfilt and will raise an error in SciPy 1.17.0. Supported dtypes are: boolean, integer, `np.float16`,`np.float32`, `np.float64`, `np.complex64`, `np.complex128`.\n  y = sosfilt(sos, x)\n"
+            },
+            "label": "intended",
+            "comment": "dtype=object is no longer supported after PR"
+        }
+    ]
+}

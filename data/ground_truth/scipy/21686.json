@@ -1,0 +1,132 @@
+{
+    "pr_number": 21686,
+    "log_file": "21686_2025-06-02 09:07:28.json",
+    "differentiating_tests": [
+        {
+            "test": {
+                "test_code": "# Example 2:\nimport numpy as np\nfrom scipy import signal\n\ndata = np.array([1, 2, 3, 4, 5], dtype=np.int32)\noutput = signal.resample_poly(data, up=3, down=2)\nprint(\"Output with up=3, down=2:\", output)",
+                "old_output": "Output with up=3, down=2: [0. 0. 0. 0. 0. 0. 0. 0.]\n",
+                "new_output": "Output with up=3, down=2: [1.00060617 1.56148245 2.49924503 3.00181852 3.31384859 4.89857729\n 5.00303087 1.61544745]\n"
+            },
+            "label": "intended",
+            "comment": ""
+        },
+        {
+            "test": {
+                "test_code": "# Example 4:\nimport numpy as np\nfrom scipy import signal\n\ndata = np.array([4, 3, 2, 1], dtype=np.int32)\noutput = signal.resample_poly(data, up=1, down=2)\nprint(\"Output with up=1, down=2:\", output)",
+                "old_output": "Output with up=1, down=2: [0. 0.]\n",
+                "new_output": "Output with up=1, down=2: [2.85020578 2.26731885]\n"
+            },
+            "label": "intended",
+            "comment": ""
+        },
+        {
+            "test": {
+                "test_code": "# Example 7:\nimport numpy as np\nfrom scipy import signal\n\ndata = np.array([1, 0, 1], dtype=np.int32)\noutput = signal.resample_poly(data, up=3, down=1)\nprint(\"Output with up=3, down=1 on binary data:\", output)",
+                "old_output": "Output with up=3, down=1 on binary data: [0. 0. 0. 0. 0. 0. 0. 0. 0.]\n",
+                "new_output": "Output with up=3, down=1 on binary data: [1.00060617e+00 6.69958892e-01 2.10866929e-01 7.62839499e-17\n 2.10866929e-01 6.69958892e-01 1.00060617e+00 9.29967184e-01\n 4.97679761e-01]\n"
+            },
+            "label": "intended",
+            "comment": ""
+        },
+        {
+            "test": {
+                "test_code": "# Example 10:\nimport numpy as np\nfrom scipy import signal\n\ndata = np.array([0, -1, -2], dtype=np.int32)\noutput = signal.resample_poly(data, up=2, down=1)\nprint(\"Output with negative values:\", output)",
+                "old_output": "Output with negative values: [0. 0. 0. 0. 0. 0.]\n",
+                "new_output": "Output with negative values: [ 3.31422347e-17 -2.29679902e-01 -1.00051747e+00 -1.90020207e+00\n -2.00103494e+00 -1.06494099e+00]\n"
+            },
+            "label": "intended",
+            "comment": ""
+        },
+        {
+            "test": {
+                "test_code": "# Example 1:\nimport numpy as np\nfrom scipy.signal import resample_poly\n\n# Simple case: Up-sampling by a factor of 2 and down-sampling by a factor of 1\nx = np.array([0, 1, 0, -1])\nup = 2\ndown = 1\nresult = resample_poly(x, up, down)\nprint(\"Result of resampling (up=2, down=1):\", result)",
+                "old_output": "Result of resampling (up=2, down=1): [0. 0. 0. 0. 0. 0. 0. 0.]\n",
+                "new_output": "Result of resampling (up=2, down=1): [ 6.36939231e-18  5.22824124e-01  1.00051747e+00  8.35261086e-01\n  0.00000000e+00 -8.35261086e-01 -1.00051747e+00 -5.22824124e-01]\n"
+            },
+            "label": "intended",
+            "comment": ""
+        },
+        {
+            "test": {
+                "test_code": "# Example 5:\nimport numpy as np\nfrom scipy.signal import resample_poly\n\n# Multi-dimensional input array (2D signal)\nx = np.array([[0, 1, 0], [1, 0, 1]])\nup = 2\ndown = 1\nresult = resample_poly(x, up, down, axis=1)\nprint(\"Result of resampling 2D signal (up=2, down=1):\")\nprint(result)",
+                "old_output": "Result of resampling 2D signal (up=2, down=1):\n[[0. 0. 0. 0. 0. 0.]\n [0. 0. 0. 0. 0. 0.]]\n",
+                "new_output": "Result of resampling 2D signal (up=2, down=1):\n[[ 3.81385937e-17  6.33400691e-01  1.00051747e+00  6.33400691e-01\n   3.81385937e-17 -2.01860395e-01]\n [ 1.00051747e+00  4.31540297e-01  7.62771874e-17  4.31540297e-01\n   1.00051747e+00  7.43977259e-01]]\n"
+            },
+            "label": "intended",
+            "comment": ""
+        },
+        {
+            "test": {
+                "test_code": "# Example 17:\nimport numpy as np\nfrom scipy.signal import resample_poly\n\n# Higher-dimensional data\nx = np.array([[1, 2, 3], [4, 5, 6]])\nup = 2\ndown = 1\nresult = resample_poly(x, up, down, axis=0)\nprint(\"Result of resampling 2D signal along axis=0 (up=2, down=1):\")\nprint(result)",
+                "old_output": "Result of resampling 2D signal along axis=0 (up=2, down=1):\n[[0. 0. 0.]\n [0. 0. 0.]\n [0. 0. 0.]\n [0. 0. 0.]]\n",
+                "new_output": "Result of resampling 2D signal along axis=0 (up=2, down=1):\n[[1.00051747 2.00103494 3.00155241]\n [3.16700346 4.43380484 5.70060622]\n [4.00206988 5.00258735 6.00310482]\n [2.33174237 2.76328267 3.19482296]]\n"
+            },
+            "label": "intended",
+            "comment": ""
+        },
+        {
+            "test": {
+                "test_code": "# Example 8:\nimport numpy as np\nfrom scipy.signal import resample_poly\n\n# Changing axis during resampling\nx = np.array([1, 2, 3, 4, 5])\nup = 2\ndown = 1\nresult = resample_poly(x, up, down, axis=0)\nprint(\"Result of resampling along axis 0 (up=2, down=1):\", result)",
+                "old_output": "Result of resampling along axis 0 (up=2, down=1): [0. 0. 0. 0. 0. 0. 0. 0. 0. 0.]\n",
+                "new_output": "Result of resampling along axis 0 (up=2, down=1): [1.00051747 1.39352536 2.00103494 2.71058432 3.00155241 3.13135864\n 4.00206988 5.24749781 5.00258735 2.5979771 ]\n"
+            },
+            "label": "intended",
+            "comment": ""
+        },
+        {
+            "test": {
+                "test_code": "# Example 14:\nimport numpy as np\nfrom scipy.signal import resample_poly\n\n# Single value input\nx = np.array([42])\nup = 2\ndown = 1\nresult = resample_poly(x, up, down)\nprint(\"Result of resampling single value array (up=2, down=1):\", result)",
+                "old_output": "Result of resampling single value array (up=2, down=1): [0. 0.]\n",
+                "new_output": "Result of resampling single value array (up=2, down=1): [42.02173377 26.60282904]\n"
+            },
+            "label": "intended",
+            "comment": ""
+        },
+        {
+            "test": {
+                "test_code": "# Example 15:\nimport numpy as np\nfrom scipy.signal import resample_poly\n\n# Very large up and down factors\nx = np.array([1, 2, 3, 4])\nup = 1000\ndown = 1\nresult = resample_poly(x, up, down)\nprint(\"Result of resampling with large up factor (up=1000, down=1):\", result)",
+                "old_output": "Result of resampling with large up factor (up=1000, down=1): [0. 0. 0. ... 0. 0. 0.]\n",
+                "new_output": "Result of resampling with large up factor (up=1000, down=1): [1.00067514 1.00234743 1.00401988 ... 0.00877069 0.00584022 0.00291665]\n"
+            },
+            "label": "intended",
+            "comment": ""
+        },
+        {
+            "test": {
+                "test_code": "# Example 6:\nimport numpy as np\nfrom scipy.signal import resample_poly\n\n# Negative values\nx = np.array([-1, -2, -3, -4])\nup = 2\ndown = 1\nresult = resample_poly(x, up, down)\nprint(\"Result of resampling negative values (up=2, down=1):\", result)",
+                "old_output": "Result of resampling negative values (up=2, down=1): [0. 0. 0. 0. 0. 0. 0. 0.]\n",
+                "new_output": "Result of resampling negative values (up=2, down=1): [-1.00051747 -1.73692716 -2.00103494 -2.15770148 -3.00155241 -4.14066062\n -4.00206988 -2.08049436]\n"
+            },
+            "label": "intended",
+            "comment": ""
+        },
+        {
+            "test": {
+                "test_code": "# Example 18:\nimport numpy as np\nfrom scipy.signal import resample_poly\n\n# Resampling with large factors that lead to non-integer output sizes\nx = np.array([1, 2, 3])\nup = 10\ndown = 7\nresult = resample_poly(x, up, down)\nprint(\"Result of resampling with non-integer output size factors (up=10, down=7):\", result)",
+                "old_output": "Result of resampling with non-integer output size factors (up=10, down=7): [0. 0. 0. 0. 0.]\n",
+                "new_output": "Result of resampling with non-integer output size factors (up=10, down=7): [1.000669   1.50604121 2.80471406 2.82046549 0.5546559 ]\n"
+            },
+            "label": "intended",
+            "comment": ""
+        },
+        {
+            "test": {
+                "test_code": "# Example 9:\nimport numpy as np\nfrom scipy.signal import resample_poly\n\n# Using an integer type input and varying up/down\nx = np.array([1, 2, 3, 4], dtype=int)\nresult_float = resample_poly(x, 2, 3)\nresult_int = resample_poly(x.astype(float), 2, 3).astype(int)\nprint(\"Result of resampling integer input (up=2, down=3, float result):\", result_float)",
+                "old_output": "Result of resampling integer input (up=2, down=3, float result): [0. 0. 0.]\n",
+                "new_output": "Result of resampling integer input (up=2, down=3, float result): [0.81570021 2.75147723 3.22254347]\n"
+            },
+            "label": "intended",
+            "comment": ""
+        },
+        {
+            "test": {
+                "test_code": "# Example 11:\nimport numpy as np\nfrom scipy.signal import resample_poly\n\n# Single-row array with mixed types\nx = np.array([1.0, 2.0, 3.0, '4'])\nup = 2\ndown = 1\ntry:\n    result = resample_poly(x, up, down)\n    print(\"Result of resampling mixed type input (up=2, down=1):\", result)\nexcept Exception as e:\n    print(\"Error encountered with mixed types:\", e)",
+                "old_output": "double free or corruption (!prev)\ntimeout: the monitored command dumped core\n",
+                "new_output": "Error encountered with mixed types: No matching signature found\n"
+            },
+            "label": "intended",
+            "comment": "Error should be the same, but timeout of the execution is too short of the docker container of testora"
+        }
+    ]
+}
