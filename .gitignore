@@ -26,5 +26,5 @@ coverage_report
 # Remove these lines when finished with BA
 
 execution.sh
-*.json
+#*.json
 
