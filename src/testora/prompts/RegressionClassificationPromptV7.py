@@ -1,3 +1,6 @@
+from testora.util.Logs import CreatePromptEvent, append_event
+from testora import Config
+
 class RegressionClassificationPromptV7:
     def __init__(self, project_name, pr, fut_qualified_names, docstrings, test_code, old_output, new_output):
         self.project_name = project_name
@@ -70,7 +73,7 @@ class RegressionClassificationPromptV7:
             issues_str += pull_body[:8000]
             issues_str += f"\n\n"
 
-        return issues_str[:7000]
+        return issues_str[:32000]
         
     def extract_reference_comments(self) -> str:
         comments_str = ""
@@ -148,11 +151,35 @@ Explain your reasoning and then give your answers in the following format:
                                     self.fut_qualified_names),
                                 docstrings=self.docstrings,
                                 pr_details=self.extract_pr_details(),
+                                rel_issues=self.extract_reference_issues(),
+                                rel_comments=self.extract_reference_comments(),
                                 diff=self.pr.get_full_diff(),
                                 test_code=self.test_code,
                                 old_output=self.old_output,
                                 new_output=self.new_output)
-        if len(query) < 30000:
+        
+        append_event(CreatePromptEvent(pr_nb=self.pr.number,
+                                       message="Classification Prompt V4.1",
+                                       length=len(query)))
+
+        if len(query) < 60000:
+            return query
+        
+        query = template.format(project_name=self.project_name,
+                                pr_title=self.pr.github_pr.title,
+                                fut_qualified_names=", ".join(
+                                    self.fut_qualified_names),
+                                docstrings=self.docstrings,
+                                pr_details=self.extract_pr_details(),
+                                pr_body="(omitted due to lenght)",
+                                rel_issues="(omitted due to lenght)",
+                                rel_comments="(omitted due to lenght)",
+                                diff=self.pr.get_full_diff(),
+                                test_code=self.test_code,
+                                old_output=self.old_output,
+                                new_output=self.new_output)
+        
+        if len(query) < 60000:
             return query
 
         # too long, try with filtered diff
@@ -162,11 +189,14 @@ Explain your reasoning and then give your answers in the following format:
                                     self.fut_qualified_names),
                                 docstrings=self.docstrings,
                                 pr_details=self.extract_pr_details(),
+                                pr_body="(omitted due to lenght)",
+                                rel_issues="(omitted due to lenght)",
+                                rel_comments="(omitted due to lenght)",
                                 diff=self.pr.get_filtered_diff(),
                                 test_code=self.test_code,
                                 old_output=self.old_output,
                                 new_output=self.new_output)
-        if len(query) < 30000:
+        if len(query) < 60000:
             return query
 
         # still too long, try without diff
@@ -176,15 +206,18 @@ Explain your reasoning and then give your answers in the following format:
                                     self.fut_qualified_names),
                                 docstrings=self.docstrings,
                                 pr_details=self.extract_pr_details(),
+                                pr_body="(omitted due to lenght)",
+                                rel_issues="(omitted due to lenght)",
+                                rel_comments="(omitted due to lenght)",
                                 diff="(omitted due to length)",
                                 test_code=self.test_code,
                                 old_output=self.old_output,
                                 new_output=self.new_output)
-        if len(query) < 30000:
+        if len(query) < 60000:
             return query
 
         # still too long, omit some PR details
-        chars_to_save = len(query) - 30000
+        chars_to_save = len(query) - 60000
         full_pr_details = self.extract_pr_details()
         shortened_pr_details = full_pr_details[:(
             len(full_pr_details) - chars_to_save)]
@@ -195,6 +228,9 @@ Explain your reasoning and then give your answers in the following format:
                                     self.fut_qualified_names),
                                 docstrings=self.docstrings,
                                 pr_details=shortened_pr_details,
+                                pr_body="(omitted due to lenght)",
+                                rel_issues="(omitted due to lenght)",
+                                rel_comments="(omitted due to lenght)",
                                 diff="(omitted due to length)",
                                 test_code=self.test_code,
                                 old_output=self.old_output,

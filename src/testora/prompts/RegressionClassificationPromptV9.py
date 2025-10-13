@@ -9,9 +9,16 @@ class RegressionClassificationPromptV9:
         self.fut_qualified_names = fut_qualified_names
         self.docstrings = docstrings
         self.test_code = test_code
-        self.old_output = old_output
-        self.new_output = new_output
+        self.old_output = self.get_output(old_output)
+        self.new_output = self.get_output(new_output)
         self.use_json_output = False
+
+
+    def get_output(self, output: str) -> str:
+        if output == "":
+            return "(No output, test case terminates)"
+        else:
+            return output
 
     def extract_pr_details(self):
         comments = ""
