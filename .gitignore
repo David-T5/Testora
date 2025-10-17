@@ -25,6 +25,7 @@ coverage_report
 # Created for Bachelor Thesis David Tischer
 # Remove these lines when finished with BA
 
+.devcontainer/postCreateCommands.sh
 execution.sh
 #*.json
 
