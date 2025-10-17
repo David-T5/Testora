@@ -69,9 +69,9 @@ class ClassifierEvalEvent(Event):
 
 class PullRequestReferencesEvent(Event):
     related_issues_count: int
-    related_issues: str
+    related_pulls_count: int
     related_comments_count: int
-    related_comments: str
+
 
 class CreatePromptEvent(Event):
     length: int 

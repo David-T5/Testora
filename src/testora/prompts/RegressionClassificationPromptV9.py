@@ -1,4 +1,4 @@
-from testora.util.Logs import CreatePromptEvent, append_event
+from testora.util.Logs import CreatePromptEvent, append_event, PullRequestReferencesEvent
 from testora import Config
 from testora.util.PythonCodeUtil import get_code_without_docstrings
 
@@ -182,6 +182,15 @@ Explain your reasoning and then give your answers in the following format:
         append_event(CreatePromptEvent(pr_nb=self.pr.number,
                                        message="Classification Prompt V4.1",
                                        length=len(query)))
+        
+        issues, pulls = self.pr.get_reference_issues_and_pulls()
+        comments = self.pr.get_reference_comments()
+
+        append_event(PullRequestReferencesEvent(pr_nb=self.pr.number,
+                                                message="PR References",
+                                                related_issues_count=len(issues),
+                                                related_pulls_count=len(pulls),
+                                                related_comments_count=(comments)))
 
         if len(query) < 60000:
             return query
