@@ -190,7 +190,7 @@ Explain your reasoning and then give your answers in the following format:
                                                 message="PR References",
                                                 related_issues_count=len(issues),
                                                 related_pulls_count=len(pulls),
-                                                related_comments_count=(comments)))
+                                                related_comments_count=len(comments)))
 
         if len(query) < 60000:
             return query
