@@ -87,7 +87,7 @@ class RegressionClassificationPromptV4_1:
 
     def create_prompt(self):
         template = """
-Are you shure about your previous answers for the pull request "{pr_title}" of the {project_name} project that changes the {fut_qualified_names} function(s)?
+Are you sure about your previous answers for the pull request "{pr_title}" of the {project_name} project that changes the {fut_qualified_names} function(s)?
 Some details have been added to the information below. Please reconsider the task and determine whether this change accidentally introduces a regression bug, i.e., an unintended change in the functional behavior of the code. This task is important because code changes sometimes have unintended consequences.
 
 # Details about the pull request
