@@ -66,7 +66,7 @@ class RegressionClassificationPromptV9:
             issues, pulls = self.pr.get_reference_issues_and_pulls()
 
             for issue in issues:
-                issue_body = issue.body
+                issue_body = (issue.body if isinstance(issue.body, str) else "(Body is missing)")
                 issue_nb = issue.number
                 issue_title = issue.title
                 issues_str += f"## Issue {issue_nb}: {issue_title} \n"
@@ -75,7 +75,7 @@ class RegressionClassificationPromptV9:
                 issues_str += f"\n\n"
 
             for pull in pulls:
-                pull_body = pull.body
+                pull_body = (pull.body if isinstance(pull.body, str) else "(Body is missing)")
                 pull_nb = pull.number
                 pull_title = pull.title
                 issues_str += f"## Pull {pull_nb}: {pull_title} \n"
