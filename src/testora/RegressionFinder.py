@@ -17,11 +17,7 @@ from testora.prompts.RegressionClassificationPromptV4_1 import RegressionClassif
 from testora.prompts.RegressionClassificationPromptV5 import RegressionClassificationPromptV5
 from testora.prompts.RegressionClassificationPromptV6 import RegressionClassificationPromptV6 
 from testora.prompts.RegressionClassificationPromptV7 import RegressionClassificationPromptV7
-from testora.prompts.RegressionClassificationPromptV9 import RegressionClassificationPromptV9
-from testora.prompts.RegressionClassificationPromptV9_1 import RegressionClassificationPromptV9_1
-from testora.prompts.RegressionClassificationPromptV9_2 import RegressionClassificationPromptV9_2
-from testora.prompts.RegressionClassificationPromptV10 import RegressionClassificationPromptV10
-from testora.prompts.RegressionClassificationPromptV12 import RegressionClassificationPromptV12
+from testora.prompts.RegressionClassificationPromptV8 import RegressionClassificationPromptV8
 from testora.prompts.RegressionTestGeneratorPrompt import RegressionTestGeneratorPrompt
 from testora.prompts.SelectExpectedBehaviorPrompt import SelectExpectedBehaviorPrompt
 from testora.util.ClonedRepoManager import ClonedRepoManager
@@ -63,21 +59,9 @@ elif Config.classification_prompt_version == 6:
 elif Config.classification_prompt_version == 7:
     RegressionClassificationPrompt = RegressionClassificationPromptV7
     SecondClassificationPrompt = RegressionClassificationPromptV7
-elif Config.classification_prompt_version == 9:
-    RegressionClassificationPrompt = RegressionClassificationPromptV9 
-    SecondClassificationPrompt = RegressionClassificationPromptV9
-elif Config.classification_prompt_version == 10:
-    RegressionClassificationPrompt = RegressionClassificationPromptV10
-    SecondClassificationPrompt = RegressionClassificationPromptV10
-elif Config.classification_prompt_version == 12:
-    RegressionClassificationPrompt = RegressionClassificationPromptV12
-    SecondClassificationPrompt = RegressionClassificationPromptV12
-elif Config.classification_prompt_version == 91:
-    RegressionClassificationPrompt = RegressionClassificationPromptV9_1
-    SecondClassificationPrompt = RegressionClassificationPromptV9_1
-elif Config.classification_prompt_version == 92:
-    RegressionClassificationPrompt = RegressionClassificationPromptV9_2
-    SecondClassificationPrompt = RegressionClassificationPromptV9_2
+elif Config.classification_prompt_version == 8:
+    RegressionClassificationPrompt = RegressionClassificationPromptV8 
+    SecondClassificationPrompt = RegressionClassificationPromptV8
 
 def clean_output(output):
     # remove warnings caused by coverage measurements
