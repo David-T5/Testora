@@ -33,10 +33,11 @@ classification_temp = 1.0
 # different prompts for classification task
 classification_prompt_version = 9
 
-ref_issues = True
-ref_comments = True
+# For taking into account related issues, pull requests, and comments
+ref_issues = False
+ref_comments = False
 
-# WARNING: Only works correctly for classification_prompt_version = 4 
+# WARNING: Works correctly only for classification_prompt_version = 4 
 automatic_chat = False
 
 # KEEP THIS AT THE END: log the current configuration
