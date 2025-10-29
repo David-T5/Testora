@@ -1,6 +1,7 @@
 from testora.util.Logs import CreatePromptEvent, append_event
 from testora import Config
 
+# Second prompt for the automatic conversation
 class RegressionClassificationPromptV4_1:
     def __init__(self, project_name, pr, fut_qualified_names, docstrings, test_code, old_output, new_output):
         self.project_name = project_name
