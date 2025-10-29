@@ -1,6 +1,8 @@
 from testora.util.Logs import CreatePromptEvent, append_event
 from testora import Config
 
+# Prompt with slightly adapted classification tasks from classification_prompt_version = 4
+# Furthermore, this prompt includes also related issues, pull requests, and comments
 class RegressionClassificationPromptV7:
     def __init__(self, project_name, pr, fut_qualified_names, docstrings, test_code, old_output, new_output):
         self.project_name = project_name
@@ -8,9 +10,16 @@ class RegressionClassificationPromptV7:
         self.fut_qualified_names = fut_qualified_names
         self.docstrings = docstrings
         self.test_code = test_code
-        self.old_output = old_output
-        self.new_output = new_output
+        self.old_output = self.get_output(old_output)
+        self.new_output = self.get_output(new_output)
         self.use_json_output = False
+
+
+    def get_output(self, output: str) -> str:
+        if output == "":
+            return "(No output, test case terminates)"
+        else:
+            return output
 
     def extract_pr_details(self):
         comments = ""
@@ -50,45 +59,56 @@ class RegressionClassificationPromptV7:
         result += "## Commit messages\n"
         result += commit_messages
         return result
-    
+
+
     def extract_reference_issues(self) -> str:  
-        issues_str = ""
-        issues, pulls = self.pr.get_reference_issues_and_pulls()
+        if Config.ref_issues:
+            issues_str = ""
+            issues, pulls = self.pr.get_reference_issues_and_pulls()
 
-        for issue in issues:
-            issue_body = issue.body
-            issue_nb = issue.number
-            issue_title = issue.title
-            issues_str += f"## Issue {issue_nb}: {issue_title} \n"
-            # Limit String lenght: Max 8000 characters per issue body
-            issues_str += issue_body[:8000]
-            issues_str += f"\n\n"
+            for issue in issues:
+                issue_body = (issue.body if isinstance(issue.body, str) else "(Body is missing)")
+                issue_nb = issue.number
+                issue_title = issue.title
+                issues_str += f"## Issue {issue_nb}: {issue_title} \n"
+                # Limit String lenght: Max 8000 characters per issue body
+                issues_str += issue_body[:8000]
+                issues_str += f"\n\n"
 
-        for pull in pulls:
-            pull_body = pull.body
-            pull_nb = pull.number
-            pull_title = pull.title
-            issues_str += f"## Pull {pull_nb}: {pull_title} \n"
-            # Limit String lenght: Max 8000 characters per pull body
-            issues_str += pull_body[:8000]
-            issues_str += f"\n\n"
+            for pull in pulls:
+                pull_body = (pull.body if isinstance(pull.body, str) else "(Body is missing)")
+                pull_nb = pull.number
+                pull_title = pull.title
+                issues_str += f"## Pull {pull_nb}: {pull_title} \n"
+                # Limit String lenght: Max 8000 characters per pull body
+                issues_str += pull_body[:8000]
+                issues_str += f"\n\n"
 
-        return issues_str[:32000]
+            return issues_str[:32000]
+        else:
+            return "(omitted)"
         
     def extract_reference_comments(self) -> str:
-        comments_str = ""
-        comments = self.pr.get_reference_comments()
-        for comment in comments:
-            comments_str += comment
-            comments_str += "--------"
-            comments_str += f"\n\n"
-        
-        return comments_str
+        if Config.ref_comments:
+            comments_str = ""
+            comments = self.pr.get_reference_comments()
 
+            for comment in comments:
+                comments_str += comment
+                comments_str += "--------"
+                comments_str += f"\n\n"
+            
+            return comments_str
+        else:
+            return "(omitted)"
+
+
+
+    
     def create_prompt(self):
         template = """
-Are you shure about your previous answers for the pull request "{pr_title}" of the {project_name} project that changes the {fut_qualified_names} function(s)?
-Some details have been added to the information below. Please reconsider the task and determine whether this change accidentally introduces a regression bug, i.e., an unintended change in the functional behavior of the code. This task is important because code changes sometimes have unintended consequences.
+The pull request "{pr_title}" of the {project_name} project changes the {fut_qualified_names} function(s).
+Your tasks is to determine whether this change accidentally introduces a regression bug, i.e., an unintended change in the functional behavior of the code. This task is important because code changes sometimes have unintended consequences.
 
 # Details about the pull request
 {pr_details}
@@ -121,8 +141,8 @@ You should explain your reasoning and then answer five questions:
 1) Is the different output a noteworthy change in behavior, such as a completely different value being computed, or is it a minor change, such as a change in a warning/error message or a change in formatting? Answer either "minor" or "noteworthy".
 2) Is the different output likely due to non-determinism, e.g., because of random sampling or a non-deterministically ordered set? Answer either "deterministic" or "non-deterministic".
 3) Does the usage example refer only to public APIs of {project_name}, or does it use any project-internal functionality? Answer either "public" or "project-internal".
-4) Considering just the API documentation, does the usage example pass inputs as intended, or does it pass any illegal (e.g., type-incorrect) inputs? Answer either "legal" or "illegal".
-5) Does the different output match the intent of the developer of the pull request? A difference is "intended" if it is in line with the description of the pull request or a logical consequence of it. In contrast, a difference is "unintended" if it is caused by an accidentally introduced regression bug. For example, a pull request that optimizes performance typically is not expected to modify the functional behavior of the code. As another example, a pull request aiming to fix a bug triggered by a specific corner case input is usually not expected to modify the behavior when executing with other inputs. In your thoughts, state the intent of the pull request, summarize how the output differs, and then reason about whether the intent and the actual output difference are consistent. Answer either "intended" or "unintended". If you not sure how to answer, please answer "unsure".
+4) Does the usage example pass inputs as intended by the API documentation, or does it pass any illegal (e.g., type-incorrect) inputs? An input would be also legal, if the computation terminates with an input that is not intended according to the API. Answer either "legal" or "illegal".
+5) Does the different output match the intent of the developer of the pull request? A difference is "intended" if it is in line with the description of the pull request. In contrast, a difference is "unintended" if it is caused by an accidentally introduced regression bug. For example, a pull request that optimizes performance typically is not expected to modify the functional behavior of the code. As another example, a pull request aiming to fix a bug triggered by a specific corner case input is usually not expected to modify the behavior when executing with other inputs. Moreover, a difference is also "unintended" if it is an involuntarily coincidental fix, i.e., fixing a bug while the intend was to improve performance, or correcting faulty behavior when the original aim was to fix a completely different bug. In your thoughts, state the intent of the pull request, summarize how the output differs, and then reason about whether the intent and the actual output difference are consistent. Answer either "intended" or "unintended".
 
 Explain your reasoning and then give your answers in the following format:
 <THOUGHTS>
@@ -144,6 +164,8 @@ Explain your reasoning and then give your answers in the following format:
 ...
 </ANSWER5>
 """
+
+        
 
         query = template.format(project_name=self.project_name,
                                 pr_title=self.pr.github_pr.title,
@@ -250,7 +272,6 @@ Explain your reasoning and then give your answers in the following format:
         is_public = None
         is_legal = None
         is_surprising = None
-        is_confident = None
         correct_output = -1
         for line in raw_answer.split("\n"):
             if in_answer == 1:
@@ -276,14 +297,8 @@ Explain your reasoning and then give your answers in the following format:
             elif in_answer == 5:
                 if line.strip() == "intended":
                     is_surprising = False
-                    is_confident = True
                 elif line.strip() == "unintended":
                     is_surprising = True
-                    is_confident = True
-                elif line.strip() == "unsure":
-                    is_surprising = False
-                    is_confident = False
-
 
             if line.strip() == "</ANSWER1>" or line.strip() == "</ANSWER2>" or line.strip() == "</ANSWER3>":
                 in_answer = 0
@@ -298,4 +313,4 @@ Explain your reasoning and then give your answers in the following format:
             if line.strip() == "<ANSWER5>":
                 in_answer = 5
 
-        return is_relevant_change, is_deterministic, is_public, is_legal, is_surprising, is_confident, True, correct_output
+        return is_relevant_change, is_deterministic, is_public, is_legal, is_surprising, True, True, correct_output
